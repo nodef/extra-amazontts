@@ -109,32 +109,32 @@ amazontts [options] <text>
 ## (all times are in milliseconds)
 
 # Environment variables:
-$AMAZONTTS_QUIET   # enable quiet mode (0)
-$AMAZONTTS_OUTPUT  # set output audio file (out.mp3)
-$AMAZONTTS_TEXT    # set input text file
-$AMAZONTTS_RETRIES # set speech synthesis retries (8)
-$AMAZONTTS_ACODEC            # set audio acodec (copy)
-$AMAZONTTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
-$AMAZONTTS_SERVICE_ENDPOINT  # set endpoint to send requests to
-$AMAZONTTS_CREDENTIALS_ID    # set AWS access key id
-$AMAZONTTS_CREDENTIALS_KEY   # set AWS secret access key
-$AMAZONTTS_CREDENTIALS_PATH  # set credentials path
-$AMAZONTTS_AUDIO_ENCODING    # set audio encoding format
-$AMAZONTTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
-$AMAZONTTS_LANGUAGE_CODE     # set language code
-$AMAZONTTS_LANGUAGE_LEXICONS # set pronounciation lexicon names
-$AMAZONTTS_VOICE_NAME        # set voice name
-$AMAZONTTS_VOICE_GENDER      # set voice gender (neutral)
-$AMAZONTTS_QUOTE_BREAK        # set quoted text break time (250)
-$AMAZONTTS_QUOTE_EMPHASIS     # set quoted text emphasis level (moderate)
-$AMAZONTTS_HEADING_BREAK      # set heading text break time (4000)
-$AMAZONTTS_HEADING_DIFFERENCE # set heading text break difference (250)
-$AMAZONTTS_HEADING_EMPHASIS   # set heading text emphasis level (strong)
-$AMAZONTTS_ELLIPSIS_BREAK     # set ellipsis break time (1500)
-$AMAZONTTS_DASH_BREAK         # set dash break time (500)
-$AMAZONTTS_NEWLINE_BREAK      # set newline break time (1000)
-$AMAZONTTS_BLOCK_LENGTH       # set SSML block length (5000)
-$AMAZONTTS_BLOCK_SEPARATOR    # set SSML block separator (.)
+$TTS_QUIET   # enable quiet mode (0)
+$TTS_OUTPUT  # set output audio file (out.mp3)
+$TTS_TEXT    # set input text file
+$TTS_RETRIES # set speech synthesis retries (8)
+$TTS_ACODEC            # set audio acodec (copy)
+$TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
+$TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
+$TTS_CREDENTIALS_ID    # set AWS access key id
+$TTS_CREDENTIALS_KEY   # set AWS secret access key
+$TTS_CREDENTIALS_PATH  # set credentials path
+$TTS_AUDIO_ENCODING    # set audio encoding format
+$TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
+$TTS_LANGUAGE_CODE     # set language code
+$TTS_LANGUAGE_LEXICONS # set pronounciation lexicon names
+$TTS_VOICE_NAME        # set voice name
+$TTS_VOICE_GENDER      # set voice gender (neutral)
+$TTS_QUOTE_BREAK        # set quoted text break time (250)
+$TTS_QUOTE_EMPHASIS     # set quoted text emphasis level (moderate)
+$TTS_HEADING_BREAK      # set heading text break time (4000)
+$TTS_HEADING_DIFFERENCE # set heading text break difference (250)
+$TTS_HEADING_EMPHASIS   # set heading text emphasis level (strong)
+$TTS_ELLIPSIS_BREAK     # set ellipsis break time (1500)
+$TTS_DASH_BREAK         # set dash break time (500)
+$TTS_NEWLINE_BREAK      # set newline break time (1000)
+$TTS_BLOCK_LENGTH       # set SSML block length (5000)
+$TTS_BLOCK_SEPARATOR    # set SSML block separator (.)
 ```
 <br>
 

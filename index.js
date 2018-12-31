@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const textToSpeech = require('@google-cloud/text-to-speech');
+const Polly = require('aws-sdk/clients/polly');
 const musicMetadata = require('music-metadata');
 const randomItem = require('random-item');
 const getStdin = require('get-stdin');
@@ -17,45 +17,49 @@ const STDIO = [0, 1, 2];
 const OPTIONS = {
   stdio: null,
   help: false,
-  log: boolean(E['GOOGLETTS_LOG']||'0'),
-  output: E['GOOGLETTS_OUTPUT']||'out.mp3',
-  text: E['GOOGLETTS_TEXT'],
-  retries: parseInt(E['GOOGLETTS_RETRIES']||'8', 10),
-  credentials: {
-    keyFilename: E['GOOGLETTS_CREDENTIALS']||E['GOOGLE_APPLICATION_CREDENTIALS']
+  quiet: boolean(E['TTS_QUIET']||'0'),
+  output: E['TTS_OUTPUT']||'out.mp3',
+  text: E['TTS_TEXT'],
+  retries: parseInt(E['TTS_RETRIES']||'8', 10),
+  acodec: E['TTS_ACODEC']||'copy',
+  service: {
+    region: E['TTS_SERVICE_REGION']||null,
+    endpoint: E['TTS_SERVICE_ENDPOINT']||null
   },
-  acodec: E['GOOGLETTS_AUDIO_ACODEC']||'copy',
-  audioConfig: {
-    audioEncoding: E['GOOGLETTS_AUDIOCONFIG_AUDIOENCODING']||null,
-    pitch: parseFloat(E['GOOGLETTS_AUDIOCONFIG_PITCH']||'0'),
-    speakingRate: parseFloat(E['GOOGLETTS_AUDIOCONFIG_SPEAKINGRATE']||'1')
+  credentials: {
+    id: E['TTS_CREDENTIALS_ID']||null,
+    key: E['TTS_CREDENTIALS_KEY']||null,
+    path: E['TTS_CREDENTIALS_PATH']||null
+  },
+  audio: {
+    encoding: E['TTS_AUDIO_ENCODING']||null,
+    frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0')
   },
   voice: {
-    name:  E['GOOGLETTS_VOICE_NAME'],
-    languageCode: E['GOOGLETTS_VOICE_LANGUAGECODE'],
-    ssmlGender: E['GOOGLETTS_VOICE_SSMLGENDER']
+    name:  E['TTS_VOICE_NAME']||null,
+    gender: E['TTS_VOICE_GENDER']||'neutral'
   },
   quote: {
-    breakTime: parseFloat(E['GOOGLETTS_QUOTE_BREAKTIME']||'250'),
-    emphasisLevel: E['GOOGLETTS_QUOTE_EMPHASISLEVEL']||'moderate'
+    breakTime: parseFloat(E['AMAZONTTS_QUOTE_BREAKTIME']||'250'),
+    emphasisLevel: E['AMAZONTTS_QUOTE_EMPHASISLEVEL']||'moderate'
   },
   heading: {
-    breakTime: parseFloat(E['GOOGLETTS_HEADING_BREAKTIME']||'4000'),
-    breakDiff: parseFloat(E['GOOGLETTS_HEADING_BREAKDIFF']||'250'),
-    emphasisLevel: E['GOOGLETTS_HEADING_EMPHASISLEVEL']||'strong',
+    breakTime: parseFloat(E['AMAZONTTS_HEADING_BREAKTIME']||'4000'),
+    breakDiff: parseFloat(E['AMAZONTTS_HEADING_BREAKDIFF']||'250'),
+    emphasisLevel: E['AMAZONTTS_HEADING_EMPHASISLEVEL']||'strong',
   },
   ellipsis: {
-    breakTime: parseFloat(E['GOOGLETTS_ELLIPSIS_BREAKTIME']||'1500')
+    breakTime: parseFloat(E['AMAZONTTS_ELLIPSIS_BREAKTIME']||'1500')
   },
   dash: {
-    breakTime: parseFloat(E['GOOGLETTS_DASH_BREAKTIME']||'500')
+    breakTime: parseFloat(E['AMAZONTTS_DASH_BREAKTIME']||'500')
   },
   newline: {
-    breakTime: parseFloat(E['GOOGLETTS_NEWLINE_BREAKTIME']||'1000')
+    breakTime: parseFloat(E['AMAZONTTS_NEWLINE_BREAKTIME']||'1000')
   },
   block: {
-    length: parseFloat(E['GOOGLETTS_BLOCK_LENGTH']||'5000'),
-    separator: E['GOOGLETTS_BLOCK_SEPARATOR']||'.'
+    length: parseFloat(E['AMAZONTTS_BLOCK_LENGTH']||'5000'),
+    separator: E['AMAZONTTS_BLOCK_SEPARATOR']||'.'
   },
 };
 const VOICE = {

@@ -16,12 +16,12 @@ Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/kje2yfdk).
 ### install
 
 1. Install [Node.js], if not installed.
-2. Run `npm install -g extra-googletts` in [console].
-3. To install this as a package use `npm install extra-googletts`.
+2. Run `npm install -g extra-amazontts` in [console].
+3. To install this as a package use `npm install extra-amazontts`.
 
 ### get service account key
 
-1. Create an [account] on [Google Cloud Platform].
+1. Create an [account] on [Amazon Web Services].
 2. Create a [new project], and select it.
 3. Enable [Cloud Text-to-Speech API] for the project.
 4. Add [credentials] to your project.
@@ -56,16 +56,16 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="[PATH OF account_id.json]"
 ## console
 
 ```bash
-googletts "I want to order a stuffed crust pizza"
+amazontts "I want to order a stuffed crust pizza"
 # out.mp3 created (yay!)
 
-googletts -t speech.txt -o speech.mp3
+amazontts -t speech.txt -o speech.mp3
 # speech.mp3 created from text in speech.txt
 
-googletts "Hello 911, my husband is in danger!" -vsg FEMALE
+amazontts "Hello 911, my husband is in danger!" -vsg FEMALE
 # out.mp3 created with female voice
 
-echo "Dead man walking." | googletts --log -vn en-US-Wavenet-B
+echo "Dead man walking." | amazontts --log -vn en-US-Wavenet-B
 # out.mp3 created with different male voice (log enabled)
 ```
 > Available [TTS voices]?
@@ -74,33 +74,39 @@ echo "Dead man walking." | googletts --log -vn en-US-Wavenet-B
 ### reference
 
 ```bash
-googletts [options] <text>
+amazontts [options] <text>
 # text: input text
 
 # Options:
 # --help:        show this help
-# -l, --log:     enable log
+# -q, --quiet:   enable quiet mode
 # -o, --output:  set output audio file (out.mp3)
 # -t, --text:    set input text file
 # -r, --retries: set speech synthesis retries (8)
-# -c, --credentials: set google credentials path
+# -c, --credentials: set credentials path
 # -a, --acodec:      set acodec (copy)
-# -acae, --audioconfig_audioencoding: set audio encoding
-# -acp,  --audioconfig_pitch:         set audio pitch (0.0)
-# -acsr, --audioconfig_speakingrate:  set audio speaking rate (1.0)
-# -vlc, --voice_languagecode:    set voice language code (en-US)
-# -vsg, --voice_ssmlgender:      set voice SSML gender (NEUTRAL)
-# -vn,  --voice_name:            set voice name (en-US-Wavenet-D)
-# -qbt, --quote_breaktime:       set quoted text break time (250)
-# -qel, --quote_emphasislevel:   set quoted text emphasis level (moderate)
-# -hbt, --heading_breaktime:     set heading text break time (4000)
-# -hbd, --heading_breakdiff:     set heading text break difference (250)
-# -hel, --heading_emphasislevel: set heading text emphasis level (strong)
-# -ebt, --ellipsis_breaktime:    set ellipsis break time (1500)
-# -dbt, --dash_breaktime:        set dash break time (500)
-# -nbt, --newline_breaktime:     set newline break time (1000)
-# -bl, --block_length:    set SSMLs block length (5000)
-# -bs, --block_separator: set SSMLs block separator (.)
+# -sr, --service_region:    set region to send service requests to
+# -se, --service_endpoint:  set endpoint to send requests to
+# -ci, --credentials_id:    set AWS access key id
+# -ck, --credentials_key:   set AWS secret access key
+# -ae, --audio_encoding:    set audio encoding
+# -as, --audio_sample:      set audio sample rate/frequency in Hz
+# -tt, --text_type:         set text type (text)
+# -lc, --language_code:     set language code
+# -ll, --language_lexicons: set pronounciation lexicon names
+# -vn, --voice_name:        set voice name
+# -vg, --voice_gender:      set voice gender
+# -qb, --quote_break:        set quoted text break time (250)
+# -qe, --quote_emphasis:     set quoted text emphasis level (moderate)
+# -hb, --heading_break:      set heading text break time (4000)
+# -hd, --heading_difference: set heading text break difference (250)
+# -he, --heading_emphasis:   set heading text emphasis level (strong)
+# -eb, --ellipsis_break:     set ellipsis break time (1500)
+# -db, --dash_break:         set dash break time (500)
+# -nb, --newline_break:      set newline break time (1000)
+# -bl, --block_length:       set SSML block length (3000)
+# -bs, --block_separator:    set SSML block separator (.)
+## (all times are in milliseconds)
 
 # Environment variables:
 $GOOGLETTS_LOG     # enable log (0)
@@ -225,17 +231,15 @@ Suggestions are welcome. Please [create an issue].
 [![nodef](https://i.imgur.com/LPVfMny.jpg)](https://nodef.github.io)
 > References: [SSML], [TTS voices], [TTS client docs].
 
-["Google TTS"]: https://cloud.google.com/text-to-speech/
+["Amazon Polly"]: https://aws.amazon.com/polly/
 ["ffmpeg"]: https://ffmpeg.org
 [Upload Wikipedia TTS videos on YouTube]: https://www.youtube.com/results?search_query=wikipedia+audio+article
 
 [Node.js]: https://nodejs.org/en/download/
 [console]: https://en.wikipedia.org/wiki/Shell_(computing)#Text_(CLI)_shells
-[Enable API]: https://console.cloud.google.com/flows/enableapi?apiid=texttospeech.googleapis.com
-[Setup authentication]: https://cloud.google.com/docs/authentication/getting-started
 
-[account]: https://accounts.google.com/signup
-[Google Cloud Platform]: https://console.developers.google.com/
+[account]: https://aws.amazon.com/free/
+[Amazon Web Services]: https://aws.amazon.com/
 [new project]: https://console.cloud.google.com/projectcreate
 [Cloud Text-to-Speech API]: https://console.cloud.google.com/apis/library/texttospeech.googleapis.com
 [credentials]: https://console.cloud.google.com/apis/credentials/wizard

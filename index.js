@@ -19,7 +19,7 @@ const OPTIONS = {
   help: false,
   log: boolean(E['TTS_LOG']||'0'),
   output: E['TTS_OUTPUT']||'out.mp3',
-  text: E['TTS_TEXT'],
+  text: E['TTS_TEXT']||null,
   retries: parseInt(E['TTS_RETRIES']||'8', 10),
   acodec: E['TTS_ACODEC']||'copy',
   service: {
@@ -146,7 +146,7 @@ function pollySynthesizeSpeechParams(out, txt, o) {
   var ae = (o.audio.encoding||path.extname(out).substring(1)).toLowerCase().replace('ogg', 'ogg_vorbis');
   var af = o.audio.frequency? o.audio.frequency.toString():null;
   var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
-  var v = VOICE.get(o.language.code), vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
+  var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
   return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: txt,
     TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
 };
@@ -199,6 +199,7 @@ function textSections(txt) {
 // Write TTS audio to file.
 function audiosWrite(out, ssml, tts, o) {
   var l = o.log, req = pollySynthesizeSpeechParams(out, ssml, o);
+  console.log(req);
   return new Promise((fres, frej) => {
     tts.synthesizeSpeech(req, (err, res) => {
       if(err) return frej(err);
@@ -340,4 +341,19 @@ async function shell(a) {
   for(var c of toc)
     if(c.title) console.log(c.time+' '+c.title);
 };
-if(require.main===module) shell(process.argv);
+// if(require.main===module) shell(process.argv);
+
+async function test() {
+  var polly = new Polly({
+    region: 'us-east-1',
+  });
+  polly.synthesizeSpeech({
+    OutputFormat: 'mp3',
+    Text: 'Halo',
+    VoiceId: 'Aditi'
+  }, (err, data) => {
+    if(err) throw err;
+    console.log(data);
+  });
+};
+test();

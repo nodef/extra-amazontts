@@ -66,6 +66,36 @@ const OPTIONS = {
     separator: E['TTS_BLOCK_SEPARATOR']||'.'
   },
 };
+const VOICE = new Map([
+  ['cmn-CN', {f: 'Zhiyu', m: null}],
+  ['da-DK', {f: 'Naja', m: 'Mads'}],
+  ['nl-NL', {f: 'Lotte', m: 'Ruben'}],
+  ['en-AU', {f: 'Nicole', m: 'Russell'}],
+  ['en-GB', {f: 'Amy', m: 'Brian'}],
+  ['en-IN', {f: 'Aditi', m: null}],
+  ['en-US', {f: 'Ivy', m: 'Joey'}],
+  ['en-GB-WLS', {f: null, m: 'Geraint'}],
+  ['fr-FR', {f: 'Celine', m: 'Mathieu'}],
+  ['fr-CA', {f: 'Chantal', m: null}],
+  ['de-DE', {f: 'Marlene', m: 'Hans'}],
+  ['hi-IN', {f: 'Aditi', m: null}],
+  ['is-IS', {f: 'Dora', m: 'Karl'}],
+  ['it-IT', {f: 'Carla', m: 'Giorgio'}],
+  ['ja-JP', {f: 'Mizuki', m: 'Takumi'}],
+  ['ko-KR', {f: 'Seoyeon', m: null}],
+  ['nb-NO', {f: 'Liv', m: null}],
+  ['pl-PL', {f: 'Ewa', m: 'Jacek'}],
+  ['pt-BR', {f: 'Vitoria', m: 'Ricardo'}],
+  ['pt-PT', {f: 'Ines', m: 'Cristiano'}],
+  ['ro-RO', {f: 'Carmen', m: null}],
+  ['ru-RU', {f: 'Tatyana', m: 'Tatyana'}],
+  ['es-ES', {f: 'Conchita', m: 'Enrique'}],
+  ['es-MX', {f: 'Mia', m: null}],
+  ['es-US', {f: 'Penelope', m: 'Miguel'}],
+  ['sv-SE', {f: 'Astrid', m: null}],
+  ['tr-TR', {f: 'Filiz', m: null}],
+  ['cy-GB', {f: 'Gwyneth', m: null}]
+]);
 const FN_NOP = () => 0;
 
 
@@ -229,6 +259,21 @@ async function outputAudio(out, auds, o) {
   return z;
 };
 
+// Get Polly constructor options.
+function pollyOptions(o) {
+  return {endpoint: o.service.endpoint, accessKeyId: o.credentials.id, secretAccessKey: o.credentials.key, region: o.service.region};
+};
+
+// Get Polly synthesize speech params.
+function pollySynthesizeSpeechParams(o) {
+  var ae = o.audio.encoding==='ogg'? 'ogg_vorbis':o.audio.encoding;
+  var af = o.audio.frequency? o.audio.frequency.toString():null;
+  var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
+  var v = VOICE.get(o.language.code), vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
+  return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: null,
+    TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
+};
+
 /**
  * Generate speech audio from super long text through machine (via "Amazon Polly", "ffmpeg").
  * @param {string} out output audio file.
@@ -240,7 +285,7 @@ async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
   var out = out||o.output, c = o.credentials
   var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
-  if(o.log) console.log('@googletts:', out, txt);
+  if(o.log) console.log('@amazontts:', out, txt);
   if(c.keyFilename) c.keyFilename = randomItem(c.keyFilename.split(';'));
   var tts = new textToSpeech.TextToSpeechClient(c);
   var ext = path.extname(out);

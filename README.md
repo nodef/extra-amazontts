@@ -90,7 +90,7 @@ amazontts [options] <text>
 # -ci, --credentials_id:    set AWS access key id
 # -ck, --credentials_key:   set AWS secret access key
 # -ae, --audio_encoding:    set audio encoding
-# -as, --audio_sample:      set audio sample rate/frequency in Hz
+# -as, --audio_frequency:   set audio frequency/sample rate in Hz
 # -tt, --text_type:         set text type (text)
 # -lc, --language_code:     set language code
 # -ll, --language_lexicons: set pronounciation lexicon names
@@ -109,29 +109,32 @@ amazontts [options] <text>
 ## (all times are in milliseconds)
 
 # Environment variables:
-$GOOGLETTS_LOG     # enable log (0)
-$GOOGLETTS_OUTPUT  # set output audio file (out.mp3)
-$GOOGLETTS_TEXT    # set input text file
-$GOOGLETTS_RETRIES # set speech synthesis retries (8)
-$GOOGLE_APPLICATION_CREDENTIALS  # set google credentials path
-$GOOGLETTS_CREDENTIALS           # set google credentials path
-$GOOGLETTS_ACODEC                # set audio acodec (copy)
-$GOOGLETTS_AUDIOCONFIG_AUDIOENCODING # set audio encoding
-$GOOGLETTS_AUDIOCONFIG_PITCH         # set audio pitch (0.0)
-$GOOGLETTS_AUDIOCONFIG_SPEAKINGRATE  # set audio speaking rate (1.0)
-$GOOGLETTS_VOICE_LANGUAGECODE    # set voice language code (en-US)
-$GOOGLETTS_VOICE_SSMLGENDER      # set voice SSML gender (NEUTRAL)
-$GOOGLETTS_VOICE_NAME            # set voice name (en-US-Wavenet-D)
-$GOOGLETTS_QUOTE_BREAKTIME       # set quoted text break time (250)
-$GOOGLETTS_QUOTE_EMPHASISLEVEL   # set quoted text emphasis level (moderate)
-$GOOGLETTS_HEADING_BREAKTIME     # set heading text break time (4000)
-$GOOGLETTS_HEADING_BREAKDIFF     # set heading text break difference (250)
-$GOOGLETTS_HEADING_EMPHASISLEVEL # set heading text emphasis level (strong)
-$GOOGLETTS_ELLIPSIS_BREAKTIME    # set ellipsis break time (1500)
-$GOOGLETTS_DASH_BREAKTIME        # set dash break time (500)
-$GOOGLETTS_NEWLINE_BREAKTIME     # set newline break time (1000)
-$GOOGLETTS_BLOCK_LENGTH    # set SSMLs block length (5000)
-$GOOGLETTS_BLOCK_SEPARATOR # set SSMLs block separator (.)
+$AMAZONTTS_QUIET   # enable quiet mode (0)
+$AMAZONTTS_OUTPUT  # set output audio file (out.mp3)
+$AMAZONTTS_TEXT    # set input text file
+$AMAZONTTS_RETRIES # set speech synthesis retries (8)
+$AMAZONTTS_CREDENTIALS       # set credentials path
+$AMAZONTTS_ACODEC            # set audio acodec (copy)
+$AMAZONTTS_SERVICE_REGION    # set region to send service requests to
+$AMAZONTTS_SERVICE_ENDPOINT  # set endpoint to send requests to
+$AMAZONTTS_CREDENTIALS_ID    # set AWS access key id
+$AMAZONTTS_CREDENTIALS_KEY   # set AWS secret access key
+$AMAZONTTS_AUDIO_ENCODING    # set audio encoding format
+$AMAZONTTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
+$AMAZONTTS_LANGUAGE_CODE     # set language code
+$AMAZONTTS_LANGUAGE_LEXICONS # set pronounciation lexicon names
+$AMAZONTTS_VOICE_NAME        # set voice name
+$AMAZONTTS_VOICE_GENDER      # set voice gender (neutral)
+$AMAZONTTS_QUOTE_BREAK        # set quoted text break time (250)
+$AMAZONTTS_QUOTE_EMPHASIS     # set quoted text emphasis level (moderate)
+$AMAZONTTS_HEADING_BREAK      # set heading text break time (4000)
+$AMAZONTTS_HEADING_DIFFERENCE # set heading text break difference (250)
+$AMAZONTTS_HEADING_EMPHASIS   # set heading text emphasis level (strong)
+$AMAZONTTS_ELLIPSIS_BREAK     # set ellipsis break time (1500)
+$AMAZONTTS_DASH_BREAK         # set dash break time (500)
+$AMAZONTTS_NEWLINE_BREAK      # set newline break time (1000)
+$AMAZONTTS_BLOCK_LENGTH       # set SSML block length (5000)
+$AMAZONTTS_BLOCK_SEPARATOR    # set SSML block separator (.)
 ```
 <br>
 

@@ -1,6 +1,6 @@
 {
   "name": "extra-amazontts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generate speech audio from super long text through machine (via \"Amazon Polly\", \"ffmpeg\").",
   "main": "index.js",
   "scripts": {
@@ -33,5 +33,8 @@
   "bugs": {
     "url": "https://github.com/nodef/extra-amazontts/issues"
   },
-  "homepage": "https://github.com/nodef/extra-amazontts#readme"
+  "homepage": "https://github.com/nodef/extra-amazontts#readme",
+  "dependencies": {
+    "aws-sdk": "^2.382.0"
+  }
 }

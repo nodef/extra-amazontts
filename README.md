@@ -85,7 +85,7 @@ amazontts [options] <text>
 # -r, --retries: set speech synthesis retries (8)
 # -c, --credentials: set credentials path
 # -a, --acodec:      set acodec (copy)
-# -sr, --service_region:    set region to send service requests to
+# -sr, --service_region:    set region to send service requests to (us-east-1)
 # -se, --service_endpoint:  set endpoint to send requests to
 # -ci, --credentials_id:    set AWS access key id
 # -ck, --credentials_key:   set AWS secret access key
@@ -113,12 +113,12 @@ $AMAZONTTS_QUIET   # enable quiet mode (0)
 $AMAZONTTS_OUTPUT  # set output audio file (out.mp3)
 $AMAZONTTS_TEXT    # set input text file
 $AMAZONTTS_RETRIES # set speech synthesis retries (8)
-$AMAZONTTS_CREDENTIALS       # set credentials path
 $AMAZONTTS_ACODEC            # set audio acodec (copy)
-$AMAZONTTS_SERVICE_REGION    # set region to send service requests to
+$AMAZONTTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
 $AMAZONTTS_SERVICE_ENDPOINT  # set endpoint to send requests to
 $AMAZONTTS_CREDENTIALS_ID    # set AWS access key id
 $AMAZONTTS_CREDENTIALS_KEY   # set AWS secret access key
+$AMAZONTTS_CREDENTIALS_PATH  # set credentials path
 $AMAZONTTS_AUDIO_ENCODING    # set audio encoding format
 $AMAZONTTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $AMAZONTTS_LANGUAGE_CODE     # set language code
@@ -142,33 +142,33 @@ $AMAZONTTS_BLOCK_SEPARATOR    # set SSML block separator (.)
 ## package
 
 ```javascript
-const googletts = require('extra-googletts');
+const amazontts = require('extra-amazontts');
 
-await googletts('out.mp3', 'I want to order a stuffed crust pizza');
+await amazontts('out.mp3', 'I want to order a stuffed crust pizza');
 // out.mp3 created (yay!)
 
 const fs = require('fs');
 var speech = fs.readFileSync('speech.txt', 'utf8');
-await googletts('speech.mp3', speech)
+await amazontts('speech.mp3', speech)
 // speech.mp3 created from text in speech.txt
 
-await googletts('out.mp3', 'Hello 911, my husband is in danger!', {
-  voice: {ssmlGender: 'FEMALE'}
+await amazontts('out.mp3', 'Hello 911, my husband is in danger!', {
+  voice: {gender: 'female'}
 });
 // out.mp3 created with female voice
 
-await googletts('out.mp3', 'Dead man walking.', {
-  voice: {name: 'en-US-Wavenet-B'}, log: true
+await amazontts('out.mp3', 'Dead man walking.', {
+  voice: {name: 'Matthew'}, quiet: true
 });
-// out.mp3 created with different male voice (log enabled)
+// out.mp3 created with different male voice (quiet mode)
 ```
 
 ### reference
 
 ```javascript
-const googletts = require('extra-googletts');
+const amazontts = require('extra-amazontts');
 
-googletts(output, text, options={})
+amazontts(output, text, options={})
 // output:  output audio file
 // text:    input text
 // options: given below
@@ -177,44 +177,51 @@ googletts(output, text, options={})
 // Default options:
 options = {
   stdio: [0, 1, 2], // set child process stdio
-  log: false,       // enable log
+  quiet: false,     // enable quiet mode
   retries: 8,       // set speech synthesis retries
-  credentials: {
-    keyFilename: '' // path to credentials
-    // see other TTS client options below
+  acodec: 'copy',   // set audio acodec
+  service: {
+    region: 'us-east-1', // set region to send service requests to
+    endpoint: ''         // set endpoint to send requests to
   },
-  acodec: 'copy',    // set audio acodec
-  audioConfig: {
-    audioEncoding: null, // set audio encoding
-    pitch: 0.0,          // set audio pitch
-    speakingRate: 1.0    // set audio speaking rate
+  credentials: {
+    id: '',   // set AWS access key id
+    key: '',  // set AWS secret access key
+    path: ''  // set credentials path
+  }, 
+  audio: {
+    encoding: '',  // set audio encoding format
+    frequency: 0,  // set audio frequency/sample rate in Hz
+  },
+  language: {
+    code: '',      // set language code
+    lexicons: [],  // set pronounciation lexicon names
   },
   voice: {
-    languageCode: 'en-US',   // set voice language code
-    ssmlGender: 'NEUTRAL'    // set voice SSML gender
-    name: 'en-US-Wavenet-D', // set voice name
-  }
+    name: '',         // set voice name
+    gender: 'neutral' // set voice gender
+  },
   quote: {
-    breakTime: 250,           // set quoted text break time
-    emphasisLevel: 'moderate' // set quoted text emphasis level
+    break: 250,          // set quoted text break time
+    emphasis: 'moderate' // set quoted text emphasis level
   },
   heading: {
-    breakTime: 4000,         // set heading text break time
-    breakDiff: 250,          // set heading text break difference
-    emphasisLevel: 'strong', // set heading text emphasis level
+    break: 4000,        // set heading text break time
+    difference: 250,    // set heading text break difference
+    emphasis: 'strong', // set heading text emphasis level
   },
   ellipsis: {
-    breakTime: 1500 // set ellipsis break time
+    break: 1500         // set ellipsis break time
   },
   dash: {
-    breakTime: 500  // set dash break time
+    break: 500          // set dash break time
   },
   newline: {
-    breakTime: 1000 // set newline break time
+    break: 1000         // set newline break time
   },
   block: {
-    length: 5000,  // set SSMLs block length
-    separator: '.' // set SSMLs block separator
+    length: 5000,       // set SSML block length
+    separator: '.'      // set SSML block separator
   }
 }
 ```

@@ -83,12 +83,12 @@ amazontts [options] <text>
 # -o, --output:  set output audio file (out.mp3)
 # -t, --text:    set input text file
 # -r, --retries: set speech synthesis retries (8)
-# -c, --credentials: set credentials path
 # -a, --acodec:      set acodec (copy)
 # -sr, --service_region:    set region to send service requests to (us-east-1)
 # -se, --service_endpoint:  set endpoint to send requests to
 # -ci, --credentials_id:    set AWS access key id
 # -ck, --credentials_key:   set AWS secret access key
+# -cp, --credentials_path:  set AWS config path (~/.aws/config)
 # -ae, --audio_encoding:    set audio encoding
 # -as, --audio_frequency:   set audio frequency/sample rate in Hz
 # -tt, --text_type:         set text type (text)
@@ -118,7 +118,8 @@ $TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
 $TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
 $TTS_CREDENTIALS_ID    # set AWS access key id
 $TTS_CREDENTIALS_KEY   # set AWS secret access key
-$TTS_CREDENTIALS_PATH  # set credentials path
+$AWS_CONFIG_FILE       # set AWS config path
+$TTS_CREDENTIALS_PATH  # set AWS config path (~/.aws/config)
 $TTS_AUDIO_ENCODING    # set audio encoding format
 $TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $TTS_LANGUAGE_CODE     # set language code

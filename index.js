@@ -35,37 +35,36 @@ const OPTIONS = {
     encoding: E['TTS_AUDIO_ENCODING']||null,
     frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0')
   },
+  language: {
+    code: E['TTS_LANGUAGE_CODE']||null,
+    lexicons: (E['TTS_LANGUAGE_LEXICONS']||'').split(',').filter(v => !!v),
+  },
   voice: {
     name:  E['TTS_VOICE_NAME']||null,
     gender: E['TTS_VOICE_GENDER']||'neutral'
   },
   quote: {
-    breakTime: parseFloat(E['AMAZONTTS_QUOTE_BREAKTIME']||'250'),
-    emphasisLevel: E['AMAZONTTS_QUOTE_EMPHASISLEVEL']||'moderate'
+    break: parseFloat(E['TTS_QUOTE_BREAK']||'250'),
+    emphasis: E['TTS_QUOTE_EMPHASIS']||'moderate'
   },
   heading: {
-    breakTime: parseFloat(E['AMAZONTTS_HEADING_BREAKTIME']||'4000'),
-    breakDiff: parseFloat(E['AMAZONTTS_HEADING_BREAKDIFF']||'250'),
-    emphasisLevel: E['AMAZONTTS_HEADING_EMPHASISLEVEL']||'strong',
+    break: parseFloat(E['TTS_HEADING_BREAK']||'4000'),
+    difference: parseFloat(E['TTS_HEADING_DIFFERENCE']||'250'),
+    emphasis: E['TTS_HEADING_EMPHASIS']||'strong',
   },
   ellipsis: {
-    breakTime: parseFloat(E['AMAZONTTS_ELLIPSIS_BREAKTIME']||'1500')
+    break: parseFloat(E['TTS_ELLIPSIS_BREAK']||'1500')
   },
   dash: {
-    breakTime: parseFloat(E['AMAZONTTS_DASH_BREAKTIME']||'500')
+    break: parseFloat(E['TTS_DASH_BREAK']||'500')
   },
   newline: {
-    breakTime: parseFloat(E['AMAZONTTS_NEWLINE_BREAKTIME']||'1000')
+    break: parseFloat(E['TTS_NEWLINE_BREAK']||'1000')
   },
   block: {
-    length: parseFloat(E['AMAZONTTS_BLOCK_LENGTH']||'5000'),
-    separator: E['AMAZONTTS_BLOCK_SEPARATOR']||'.'
+    length: parseFloat(E['TTS_BLOCK_LENGTH']||'5000'),
+    separator: E['TTS_BLOCK_SEPARATOR']||'.'
   },
-};
-const VOICE = {
-  name: 'en-US-Wavenet-D',
-  languageCode: 'en-US',
-  ssmlGender: 'NEUTRAL'
 };
 const FN_NOP = () => 0;
 

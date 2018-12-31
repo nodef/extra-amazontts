@@ -136,6 +136,21 @@ function cpExec(cmd, o) {
   }));
 };
 
+// Get Polly constructor options.
+function pollyOptions(o) {
+  return {endpoint: o.service.endpoint, accessKeyId: o.credentials.id, secretAccessKey: o.credentials.key, region: o.service.region};
+};
+
+// Get Polly synthesize speech params.
+function pollySynthesizeSpeechParams(out, txt, o) {
+  var ae = (o.audio.encoding||path.extname(out).substring(1)).toLowerCase().replace('ogg', 'ogg_vorbis');
+  var af = o.audio.frequency? o.audio.frequency.toString():null;
+  var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
+  var v = VOICE.get(o.language.code), vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
+  return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: txt,
+    TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
+};
+
 // Get SSML from text.
 function textSsml(txt, o) {
   var q = o.quote, h = o.heading, e = o.ellipsis, d = o.dash, n = o.newline;
@@ -181,27 +196,13 @@ function textSections(txt) {
   return secs;
 };
 
-// Get voice config from options.
-function voiceConfig(o)  {
-  var n = o.name;
-  var lc = n? n:(o.languageCode||VOICE.languageCode);
-  lc = lc.substring(0, 2).toLowerCase()+'-';
-  lc += lc.length>=5? lc.substring(3, 5).toUpperCase():'US';
-  var sg = (o.ssmlGender||VOICE.ssmlGender).toUpperCase();
-  if(lc===VOICE.languageCode && sg===VOICE.ssmlGender) n = n||VOICE.name;
-  return {name: n, languageCode: lc, ssmlGender: sg};
-};
-
 // Write TTS audio to file.
 function audiosWrite(out, ssml, tts, o) {
-  var l = o.log, ac = o.audioConfig||{}, v = o.voice;
-  var enc = path.extname(out).substring(1).toUpperCase();
-  ac.audioEncoding = ac.audioEncoding||enc;
-  var req = {input: {ssml}, voice: v, audioConfig: ac};
+  var l = o.log, req = pollySynthesizeSpeechParams(out, ssml, o);
   return new Promise((fres, frej) => {
     tts.synthesizeSpeech(req, (err, res) => {
       if(err) return frej(err);
-      fs.writeFile(out, res.audioContent, 'binary', (err) => {
+      fs.writeFile(out, res.AudioStream, 'binary', (err) => {
         if(l) console.log('-audiosWrite:', out);
         if(err) return frej(err);
         fres(out);
@@ -231,7 +232,6 @@ function outputSsmls(txt, o) {
 
 // Generate output audio part files.
 function outputAudios(out, ssmls, tts, o) {
-  o.voice = voiceConfig(o.voice);
   if(o.log) console.log('-outputAudios:', out, ssmls.length);
   var pth = pathFilename(out), ext = path.extname(out);
   for(var i=0, I=ssmls.length, z=[]; i<I; i++)
@@ -259,21 +259,6 @@ async function outputAudio(out, auds, o) {
   return z;
 };
 
-// Get Polly constructor options.
-function pollyOptions(o) {
-  return {endpoint: o.service.endpoint, accessKeyId: o.credentials.id, secretAccessKey: o.credentials.key, region: o.service.region};
-};
-
-// Get Polly synthesize speech params.
-function pollySynthesizeSpeechParams(o) {
-  var ae = o.audio.encoding==='ogg'? 'ogg_vorbis':o.audio.encoding;
-  var af = o.audio.frequency? o.audio.frequency.toString():null;
-  var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
-  var v = VOICE.get(o.language.code), vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
-  return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: null,
-    TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
-};
-
 /**
  * Generate speech audio from super long text through machine (via "Amazon Polly", "ffmpeg").
  * @param {string} out output audio file.
@@ -286,8 +271,7 @@ async function amazontts(out, txt, o) {
   var out = out||o.output, c = o.credentials
   var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
   if(o.log) console.log('@amazontts:', out, txt);
-  if(c.keyFilename) c.keyFilename = randomItem(c.keyFilename.split(';'));
-  var tts = new textToSpeech.TextToSpeechClient(c);
+  var tts = new Polly(pollyOptions(o));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});
   var secs = textSections('\n'+txt), prts = [], ssmls = [];
@@ -357,52 +341,3 @@ async function shell(a) {
     if(c.title) console.log(c.time+' '+c.title);
 };
 if(require.main===module) shell(process.argv);
-
-
-
-
-
-
-
-
-
-
-// Write TTS audio to file.
-function audiosWrite(out, ssml, tts, o) {
-  var l = o.log;
-  var enc = path.extname(out).substring(1).toUpperCase();
-  var req = {OutputFormat: enc==='ogg'? 'ogg_vorbis':enc, Text: ssml, TextType: 'ssml'};
-  // LexiconNames — (Array<String>)
-  // OutputFormat — (String)
-  // SampleRate — (String)
-  // SpeechMarkTypes — (Array<String>)
-  // Text — (String)
-  // TextType — (String)
-  // VoiceId — (String)
-  // LanguageCode — (String)
-  return new Promise((fres, frej) => {
-    tts.synthesizeSpeech(req, (err, res) => {
-      if(err) return frej(err);
-      fs.writeFile(out, res.AudioStream, 'binary', (err) => {
-        if(l) console.log('-audiosWrite:', out);
-        if(err) return frej(err);
-        fres(out);
-      });
-    });
-  });
-};
-
-async function test() {
-  var polly = new Polly({
-    region: 'us-east-1',
-  });
-  polly.synthesizeSpeech({
-    OutputFormat: 'mp3',
-    Text: 'Halo',
-    VoiceId: 'Aditi'
-  }, (err, data) => {
-    if(err) throw err;
-    console.log(data);
-  });
-};
-test();

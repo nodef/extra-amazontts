@@ -17,7 +17,7 @@ const STDIO = [0, 1, 2];
 const OPTIONS = {
   stdio: null,
   help: false,
-  quiet: boolean(E['TTS_QUIET']||'0'),
+  log: boolean(E['TTS_LOG']||'0'),
   output: E['TTS_OUTPUT']||'out.mp3',
   text: E['TTS_TEXT'],
   retries: parseInt(E['TTS_RETRIES']||'8', 10),
@@ -110,20 +110,20 @@ function cpExec(cmd, o) {
 function textSsml(txt, o) {
   var q = o.quote, h = o.heading, e = o.ellipsis, d = o.dash, n = o.newline;
   txt = txt.replace(/\"(.*?)\"/gm, (m, p1) => {
-    var brk = `<break time="${q.breakTime}ms"/>`;
-    var emp = `<emphasis level="${q.emphasisLevel}">"${p1}"</emphasis>`;
+    var brk = `<break time="${q.break}ms"/>`;
+    var emp = `<emphasis level="${q.emphasis}">"${p1}"</emphasis>`;
     return brk+emp+brk;
   });
   txt = txt.replace(/(=+)\s(.*?)\s\1/g, (m, p1, p2) => {
-    var brk = `<break time="${h.breakTime-p1.length*h.breakDiff}ms"/>`;
-    var emp = `<emphasis level="${h.emphasisLevel}">${p2}</emphasis>`;
+    var brk = `<break time="${h.break-p1.length*h.difference}ms"/>`;
+    var emp = `<emphasis level="${h.emphasis}">${p2}</emphasis>`;
     return brk+'Topic '+emp+brk;
   });
   // txt = txt.replace(/\((.*?)\)/gm, '<emphasis level="reduced">($1)</emphasis>');
   // txt = txt.replace(/\[(.*?)\]/gm, '<emphasis level="reduced">[$1]</emphasis>');
-  txt = txt.replace(/\.\.\./g, `<break time="${e.breakTime}ms"/>...`);
-  txt = txt.replace(/\—/g, `<break time="${d.breakTime}ms"/>—`);
-  txt = txt.replace(/(\r?\n)+/gm, `<break time="${n.breakTime}ms"/>\n`);
+  txt = txt.replace(/\.\.\./g, `<break time="${e.break}ms"/>...`);
+  txt = txt.replace(/\—/g, `<break time="${d.break}ms"/>—`);
+  txt = txt.replace(/(\r?\n)+/gm, `<break time="${n.break}ms"/>\n`);
   return `<speak>${txt}</speak>`;
 };
 
@@ -230,13 +230,13 @@ async function outputAudio(out, auds, o) {
 };
 
 /**
- * Generate speech audio from super long text through machine (via ["Google TTS"], ["ffmpeg"]).
+ * Generate speech audio from super long text through machine (via "Amazon Polly", "ffmpeg").
  * @param {string} out output audio file.
  * @param {string} txt input text.
  * @param {object} o options.
  * @returns promise <out>.
  */
-async function googletts(out, txt, o) {
+async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
   var out = out||o.output, c = o.credentials
   var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
@@ -267,33 +267,38 @@ async function googletts(out, txt, o) {
 // Get options from arguments.
 function options(o, k, a, i) {
   if(k==='--help') o.help = true;
+  else if(k==='-l' || k==='--log') o.log = true;
   else if(k==='-o' || k==='--output') o.output= a[++i];
   else if(k==='-t' || k==='--text') o.text = a[++i];
-  else if(k==='-l' || k==='--log') o.log = true;
   else if(k==='-r' || k==='--retries') o.retries = parseInt(a[++i], 10);
   else if(k==='-c' || k==='--credentials') _.set(o, 'credentials.keyFilename', a[++i]);
   else if(k==='-a' || k==='--acodec') _.set(o, 'acodec', a[++i]);
-  else if(k==='-acae' || k==='--audioconfig_audioencoding') _.set(o, 'audioConfig.audioEncoding', a[++i]);
-  else if(k==='-acp' || k==='--audioconfig_pitch') _.set(o, 'audioConfig.pitch', a[++i]);
-  else if(k==='-acsr' || k==='--audioconfig_speakingrate') _.set(o, 'audioConfig.speakingRate', a[++i]);
-  else if(k==='-vlc' || k==='--voice_languagecode') _.set(o, 'voice.languageCode', a[++i]);
-  else if(k==='-vsg' || k==='--voice_ssmlgender') _.set(o, 'voice.ssmlGender', a[++i]);
+  else if(k==='-sr' || k==='--service_region') _.set(o, 'service.region', a[++i]);
+  else if(k==='-se' || k==='--service_endpoint') _.set(o, 'service.endpoint', a[++i]);
+  else if(k==='-ci' || k==='--credentials_id') _.set(o, 'credentials.id', a[++i]);
+  else if(k==='-ck' || k==='--credentials_key') _.set(o, 'credentials.key', a[++i]);
+  else if(k==='-cp' || k==='--credentials_path') _.set(o, 'credentials.path', a[++i]);
+  else if(k==='-ae' || k==='--audio_encoding') _.set(o, 'audio.encoding', a[++i]);
+  else if(k==='-af' || k==='--audio_frequency') _.set(o, 'audio.frequency', parseInt(a[++i], 10));
+  else if(k==='-lc' || k==='--language_code') _.set(o, 'language.code', a[++i]);
+  else if(k==='-ll' || k==='--language_lexicons') _.set(o, 'language.lexicons', a[++i]);
   else if(k==='-vn' || k==='--voice_name') _.set(o, 'voice.name', a[++i]);
-  else if(k==='-qbt' || k==='--quote_breaktime') _.set(o, 'quote.breakTime', parseFloat(a[++i]));
-  else if(k==='-qel' || k==='--quote_emphasislevel') _.set(o, 'quote.emphasisLevel', a[++i]);
-  else if(k==='-hbt' || k==='--heading_breaktime') _.set(o, 'heading.breakTime', parseFloat(a[++i]));
-  else if(k==='-hbd' || k==='--heading_breakdiff') _.set(o, 'heading.breakDiff', parseFloat(a[++i]));
-  else if(k==='-hel' || k==='--heading_emphasislevel') _.set(o, 'heading.emphasisLevel', a[++i]);
-  else if(k==='-ebt' || k==='--ellipsis_breaktime') _.set(o, 'ellipsis.breakTime', parseFloat(a[++i]));
-  else if(k==='-dbt' || k==='--dash_breaktime') _.set(o, 'dash.breakTime', parseFloat(a[++i]));
-  else if(k==='-nbt' || k==='--newline_breaktime') _.set(o, 'newline.breakTime', parseFloat(a[++i]));
+  else if(k==='-vg' || k==='--voice_gender') _.set(o, 'voice.gender', a[++i]);
+  else if(k==='-qb' || k==='--quote_break') _.set(o, 'quote.break', parseFloat(a[++i]));
+  else if(k==='-qe' || k==='--quote_emphasis') _.set(o, 'quote.emphasis', a[++i]);
+  else if(k==='-hb' || k==='--heading_break') _.set(o, 'heading.break', parseFloat(a[++i]));
+  else if(k==='-hd' || k==='--heading_difference') _.set(o, 'heading.difference', parseFloat(a[++i]));
+  else if(k==='-he' || k==='--heading_emphasis') _.set(o, 'heading.emphasis', a[++i]);
+  else if(k==='-eb' || k==='--ellipsis_break') _.set(o, 'ellipsis.break', parseFloat(a[++i]));
+  else if(k==='-db' || k==='--dash_break') _.set(o, 'dash.break', parseFloat(a[++i]));
+  else if(k==='-nb' || k==='--newline_break') _.set(o, 'newline.break', parseFloat(a[++i]));
   else if(k==='-bl' || k==='--block_length') _.set(o, 'block.length', parseInt(a[++i], 10));
   else if(k==='-bs' || k==='--block_separator') _.set(o, 'block.separator', a[++i]);
   else o.input = a[i];
   return i+1;
 };
-googletts.options = options;
-module.exports = googletts;
+amazontts.options = options;
+module.exports = amazontts;
 
 // Run on shell.
 async function shell(a) {
@@ -301,7 +306,7 @@ async function shell(a) {
   for(var i=2, I=a.length; i<I;)
     i = options(o, a[i], a, i);
   if(o.help) return cp.execSync('less README.md', {cwd: __dirname, stdio: STDIO});
-  var toc = await googletts(null, null, o);
+  var toc = await amazontts(null, null, o);
   if(o.log || OPTIONS.log) return;
   for(var c of toc)
     if(c.title) console.log(c.time+' '+c.title);

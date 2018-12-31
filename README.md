@@ -79,7 +79,7 @@ amazontts [options] <text>
 
 # Options:
 # --help:        show this help
-# -q, --quiet:   enable quiet mode
+# -l, --log:     enable log
 # -o, --output:  set output audio file (out.mp3)
 # -t, --text:    set input text file
 # -r, --retries: set speech synthesis retries (8)
@@ -109,7 +109,7 @@ amazontts [options] <text>
 ## (all times are in milliseconds)
 
 # Environment variables:
-$TTS_QUIET   # enable quiet mode (0)
+$TTS_LOG     # enable log (0)
 $TTS_OUTPUT  # set output audio file (out.mp3)
 $TTS_TEXT    # set input text file
 $TTS_RETRIES # set speech synthesis retries (8)

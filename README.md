@@ -118,8 +118,8 @@ $TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
 $TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
 $TTS_CREDENTIALS_ID    # set AWS access key id
 $TTS_CREDENTIALS_KEY   # set AWS secret access key
-$AWS_CONFIG_FILE       # set AWS config path (~/.aws/config)
-$TTS_CREDENTIALS_PATH  # set AWS config JSON path
+$AWS_CONFIG_FILE       # set AWS config path
+$TTS_CREDENTIALS_PATH  # set AWS config (json/ini) path (~/.aws/config)
 $TTS_AUDIO_ENCODING    # set audio encoding format
 $TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $TTS_LANGUAGE_CODE     # set language code
@@ -188,7 +188,7 @@ options = {
   credentials: {
     id: '',   // set AWS access key id
     key: '',  // set AWS secret access key
-    path: ''  // set credentials path
+    path: ''  // set AWS config (json/ini) path
   }, 
   audio: {
     encoding: '',  // set audio encoding format
@@ -223,6 +223,12 @@ options = {
   block: {
     length: 5000,       // set SSML block length
     separator: '.'      // set SSML block separator
+  }
+  config: {         // set AWS config options "directly"
+    /* AWS config options */
+  },
+  params: {         // set Polly synthesizeSpeech params "directly"
+    /* Polly synthesizeSpeech params */
   }
 }
 ```

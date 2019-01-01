@@ -225,7 +225,7 @@ Suggestions are welcome. Please [create an issue].
 
 [extra-stillvideo]: https://www.npmjs.com/package/extra-stillvideo
 [extra-youtubeuploader]: https://www.npmjs.com/package/extra-youtubeuploader
-[create an issue]: https://github.com/nodef/extra-googletts/issues
+[create an issue]: https://github.com/nodef/extra-amazontts/issues
 
 [SSML]: https://docs.aws.amazon.com/polly/latest/dg/supported-ssml.html
 [TTS voices]: https://docs.aws.amazon.com/polly/latest/dg/voicelist.html

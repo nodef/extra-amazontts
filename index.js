@@ -137,10 +137,10 @@ function cpExec(cmd, o) {
   }));
 };
 
-// Get Polly constructor options.
-function pollyOptions(o) {
+// Get Polly config.
+function pollyConfig(o) {
   var s = o.service, c = o.credentials;
-  var z = c.path? AWS.config.loadFromPath(c.path):{};
+  var z = c.path? AWS.config.loadFromPath(randomItem(c.path.split(';'))):{};
   z.endpoint = s.endpoint||z.endpoint;
   z.accessKeyId = c.id||z.accessKeyId;
   z.secretAccessKey = c.key||z.secretAccessKey;
@@ -205,8 +205,7 @@ function textSections(txt) {
 
 // Write TTS audio to file.
 function audiosWrite(out, ssml, tts, o) {
-  var l = o.log, req = pollySynthesizeSpeechParams(out, ssml, o);
-  console.log(req);
+  var l = o.log, req = o.params; req.Text = ssml;
   return new Promise((fres, frej) => {
     tts.synthesizeSpeech(req, (err, res) => {
       if(err) return frej(err);
@@ -278,9 +277,9 @@ async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
   var out = out||o.output, c = o.credentials;
   var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
-  if(o.log) console.log('@amazontts:', out, txt, pollyOptions(o));
-  if(c.path) c.path = randomItem(c.path.split(';'));
-  var tts = new Polly(pollyOptions(o));
+  if(o.log) console.log('@amazontts:', out, txt);
+  o.params = o.params||pollySynthesizeSpeechParams(out, null, o);
+  var tts = new Polly(o.config||pollyConfig(o));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});
   var secs = textSections('\n'+txt), prts = [], ssmls = [];

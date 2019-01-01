@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-require('aws-sdk/lib/config');
 const Polly = require('aws-sdk/clients/polly');
 const musicMetadata = require('music-metadata');
 const randomItem = require('random-item');
 const getStdin = require('get-stdin');
 const boolean = require('boolean');
 const tempy = require('tempy');
+const ini = require('ini');
 const _ = require('lodash');
 const cp = require('child_process');
 const path = require('path');
@@ -137,10 +137,21 @@ function cpExec(cmd, o) {
   }));
 };
 
+// Load Polly config from path.
+function pollyConfigLoad(pth) {
+  var dat = fs.readFileSync(pth, 'utf8');
+  if(pth.endsWith('.json')) return JSON.parse(dat);
+  var cfg = ini.parse(dat), z = {};
+  cfg = cfg.default||cfg;
+  for(var k in cfg)
+    z[_.camelCase(k.replace(/^aws_/, ''))] = cfg[k];
+  return z;
+};
+
 // Get Polly config.
 function pollyConfig(o) {
   var s = o.service, c = o.credentials;
-  var z = c.path? AWS.config.loadFromPath(randomItem(c.path.split(';'))):{};
+  var z = c.path? pollyConfigLoad(randomItem(c.path.split(';'))):{};
   z.endpoint = s.endpoint||z.endpoint;
   z.accessKeyId = c.id||z.accessKeyId;
   z.secretAccessKey = c.key||z.secretAccessKey;

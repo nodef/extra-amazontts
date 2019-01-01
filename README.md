@@ -118,8 +118,8 @@ $TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
 $TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
 $TTS_CREDENTIALS_ID    # set AWS access key id
 $TTS_CREDENTIALS_KEY   # set AWS secret access key
-$AWS_CONFIG_FILE       # set AWS config path
-$TTS_CREDENTIALS_PATH  # set AWS config path (~/.aws/config)
+$AWS_CONFIG_FILE       # set AWS config path (~/.aws/config)
+$TTS_CREDENTIALS_PATH  # set AWS config JSON path
 $TTS_AUDIO_ENCODING    # set audio encoding format
 $TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $TTS_LANGUAGE_CODE     # set language code

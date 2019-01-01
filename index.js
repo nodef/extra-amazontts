@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('aws-sdk/lib/config');
 const Polly = require('aws-sdk/clients/polly');
 const musicMetadata = require('music-metadata');
 const randomItem = require('random-item');
@@ -138,7 +139,13 @@ function cpExec(cmd, o) {
 
 // Get Polly constructor options.
 function pollyOptions(o) {
-  return {endpoint: o.service.endpoint, accessKeyId: o.credentials.id, secretAccessKey: o.credentials.key, region: o.service.region};
+  var s = o.service, c = o.credentials;
+  var z = c.path? AWS.config.loadFromPath(c.path):{};
+  z.endpoint = s.endpoint||z.endpoint;
+  z.accessKeyId = c.id||z.accessKeyId;
+  z.secretAccessKey = c.key||z.secretAccessKey;
+  z.region = s.region||z.region||'us-east-1';
+  return z;
 };
 
 // Get Polly synthesize speech params.
@@ -146,7 +153,7 @@ function pollySynthesizeSpeechParams(out, txt, o) {
   var ae = (o.audio.encoding||path.extname(out).substring(1)).toLowerCase().replace('ogg', 'ogg_vorbis');
   var af = o.audio.frequency? o.audio.frequency.toString():null;
   var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
-  var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||null:v.f||v.m||null);
+  var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||'Joey':v.f||v.m||'Ivy');
   return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: txt,
     TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
 };
@@ -269,9 +276,10 @@ async function outputAudio(out, auds, o) {
  */
 async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
-  var out = out||o.output, c = o.credentials
+  var out = out||o.output, c = o.credentials;
   var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
-  if(o.log) console.log('@amazontts:', out, txt);
+  if(o.log) console.log('@amazontts:', out, txt, pollyOptions(o));
+  if(c.path) c.path = randomItem(c.path.split(';'));
   var tts = new Polly(pollyOptions(o));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});
@@ -301,7 +309,6 @@ function options(o, k, a, i) {
   else if(k==='-o' || k==='--output') o.output= a[++i];
   else if(k==='-t' || k==='--text') o.text = a[++i];
   else if(k==='-r' || k==='--retries') o.retries = parseInt(a[++i], 10);
-  else if(k==='-c' || k==='--credentials') _.set(o, 'credentials.keyFilename', a[++i]);
   else if(k==='-a' || k==='--acodec') _.set(o, 'acodec', a[++i]);
   else if(k==='-sr' || k==='--service_region') _.set(o, 'service.region', a[++i]);
   else if(k==='-se' || k==='--service_endpoint') _.set(o, 'service.endpoint', a[++i]);
@@ -341,19 +348,4 @@ async function shell(a) {
   for(var c of toc)
     if(c.title) console.log(c.time+' '+c.title);
 };
-// if(require.main===module) shell(process.argv);
-
-async function test() {
-  var polly = new Polly({
-    region: 'us-east-1',
-  });
-  polly.synthesizeSpeech({
-    OutputFormat: 'mp3',
-    Text: 'Halo',
-    VoiceId: 'Aditi'
-  }, (err, data) => {
-    if(err) throw err;
-    console.log(data);
-  });
-};
-test();
+if(require.main===module) shell(process.argv);

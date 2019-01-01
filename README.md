@@ -7,7 +7,7 @@ Generate speech audio from super long text through machine (via ["Amazon Polly"]
 > - Experiment with various voices from around the globe?
 > - Or, [Upload Wikipedia TTS videos on YouTube]?
 
-Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/kje2yfdk).
+Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/zyuywxcb).
 <br>
 
 
@@ -18,38 +18,6 @@ Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/kje2yfdk).
 1. Install [Node.js], if not installed.
 2. Run `npm install -g extra-amazontts` in [console].
 3. To install this as a package use `npm install extra-amazontts`.
-
-### get service account key
-
-1. Create an [account] on [Amazon Web Services].
-2. Create a [new project], and select it.
-3. Enable [Cloud Text-to-Speech API] for the project.
-4. Add [credentials] to your project.
-5. Which API are you using? `Cloud Text-to-Speech API`.
-6. Are you planning to use this API with App Engine or Compute Engine? `No, I’m not using them`.
-7. Select `What credentials do I need`?.
-8. Create a service account.
-9. Service account name: `googletts` (your choice).
-10. Role: `Project -> Owner`.
-11. Service account ID: `googletts` (same as name).
-12. Key type: `JSON`.
-13. Select `Continue`.
-14. Copy downloaded file to a directory.
-15. Rename the file to `account_id.json`.
-
-### set environment variable
-
-1. Copy path of `account_id.json`.
-2. Set environment variable `GOOGLE_APPLICATION_CREDENTIALS` to it.
-> On Windows, use [RapidEE] to set environment variable.
-
-```bash
-# on linux or macos console
-export GOOGLE_APPLICATION_CREDENTIALS="[PATH OF account_id.json]"
-
-# on windows powershell
-$env:GOOGLE_APPLICATION_CREDENTIALS="[PATH OF account_id.json]"
-```
 <br>
 
 
@@ -118,13 +86,13 @@ $TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
 $TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
 $TTS_CREDENTIALS_ID    # set AWS access key id
 $TTS_CREDENTIALS_KEY   # set AWS secret access key
-$AWS_CONFIG_FILE       # set AWS config path
-$TTS_CREDENTIALS_PATH  # set AWS config (json/ini) path (~/.aws/config)
+$AWS_CONFIG_FILE       # set AWS config path (~/.aws/config)
+$TTS_CREDENTIALS_PATH  # set AWS config (json/ini) path
 $TTS_AUDIO_ENCODING    # set audio encoding format
 $TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $TTS_LANGUAGE_CODE     # set language code
 $TTS_LANGUAGE_LEXICONS # set pronounciation lexicon names
-$TTS_VOICE_NAME        # set voice name
+$TTS_VOICE_NAME        # set voice name (Joanna)
 $TTS_VOICE_GENDER      # set voice gender (neutral)
 $TTS_QUOTE_BREAK        # set quoted text break time (250)
 $TTS_QUOTE_EMPHASIS     # set quoted text emphasis level (moderate)
@@ -254,13 +222,6 @@ Suggestions are welcome. Please [create an issue].
 
 [Node.js]: https://nodejs.org/en/download/
 [console]: https://en.wikipedia.org/wiki/Shell_(computing)#Text_(CLI)_shells
-
-[account]: https://aws.amazon.com/free/
-[Amazon Web Services]: https://aws.amazon.com/
-[new project]: https://console.cloud.google.com/projectcreate
-[Cloud Text-to-Speech API]: https://console.cloud.google.com/apis/library/texttospeech.googleapis.com
-[credentials]: https://console.cloud.google.com/apis/credentials/wizard
-[RapidEE]: https://www.rapidee.com/en/about
 
 [extra-stillvideo]: https://www.npmjs.com/package/extra-stillvideo
 [extra-youtubeuploader]: https://www.npmjs.com/package/extra-youtubeuploader

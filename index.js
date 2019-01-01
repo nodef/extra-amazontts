@@ -164,7 +164,7 @@ function pollySynthesizeSpeechParams(out, txt, o) {
   var ae = (o.audio.encoding||path.extname(out).substring(1)).toLowerCase().replace('ogg', 'ogg_vorbis');
   var af = o.audio.frequency? o.audio.frequency.toString():null;
   var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
-  var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||'Joey':v.f||v.m||'Ivy');
+  var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||'Joey':v.f||v.m||'Joanna');
   return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: txt,
     TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
 };

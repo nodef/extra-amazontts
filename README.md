@@ -30,10 +30,10 @@ amazontts "I want to order a stuffed crust pizza"
 amazontts -t speech.txt -o speech.mp3
 # speech.mp3 created from text in speech.txt
 
-amazontts "Hello 911, my husband is in danger!" -vsg FEMALE
+amazontts "Hello 911, my husband is in danger!" -vg female
 # out.mp3 created with female voice
 
-echo "Dead man walking." | amazontts --log -vn en-US-Wavenet-B
+echo "Dead man walking." | amazontts --log -vn Matthew
 # out.mp3 created with different male voice (log enabled)
 ```
 > Available [TTS voices]?

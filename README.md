@@ -227,6 +227,6 @@ Suggestions are welcome. Please [create an issue].
 [extra-youtubeuploader]: https://www.npmjs.com/package/extra-youtubeuploader
 [create an issue]: https://github.com/nodef/extra-googletts/issues
 
-[SSML]: https://developers.google.com/actions/reference/ssml
-[TTS voices]: https://cloud.google.com/text-to-speech/docs/voices
-[TTS client docs]: https://cloud.google.com/nodejs/docs/reference/text-to-speech/0.1.x/v1beta1.TextToSpeechClient
+[SSML]: https://docs.aws.amazon.com/polly/latest/dg/supported-ssml.html
+[TTS voices]: https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
+[TTS client docs]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Polly.html

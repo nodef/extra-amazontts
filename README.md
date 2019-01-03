@@ -213,7 +213,7 @@ Suggestions are welcome. Please [create an issue].
 <br><br>
 
 
-[![nodef](https://i.imgur.com/LPVfMny.jpg)](https://nodef.github.io)
+[![nodef](https://i.imgur.com/Ui0cS8T.jpg)](https://nodef.github.io)
 > References: [SSML], [TTS voices], [TTS client docs].
 
 ["Amazon Polly"]: https://aws.amazon.com/polly/

@@ -236,6 +236,7 @@ async function audiosRetryWrite(out, ssml, tts, o) {
     try { return await audiosWrite(out, ssml, tts, o); }
     catch(e) { err = e; }
   }
+  console.log(ssml);
   throw err;
 };
 

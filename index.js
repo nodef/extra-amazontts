@@ -63,7 +63,7 @@ const OPTIONS = {
     break: parseFloat(E['TTS_NEWLINE_BREAK']||'1000')
   },
   block: {
-    length: parseFloat(E['TTS_BLOCK_LENGTH']||'5000'),
+    length: parseFloat(E['TTS_BLOCK_LENGTH']||'2000'),
     separator: E['TTS_BLOCK_SEPARATOR']||'.'
   },
 };

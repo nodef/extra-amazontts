@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const Polly = require('aws-sdk/clients/polly');
 const musicMetadata = require('music-metadata');
-const randomItem = require('random-item');
+const awsconfig = require('extra-awsconfig');
 const getStdin = require('get-stdin');
 const boolean = require('boolean');
 const tempy = require('tempy');
@@ -16,22 +16,11 @@ const fs = require('fs');
 const E = process.env;
 const STDIO = [0, 1, 2];
 const OPTIONS = {
-  stdio: null,
-  help: false,
   log: boolean(E['TTS_LOG']||'0'),
   output: E['TTS_OUTPUT']||'out.mp3',
   text: E['TTS_TEXT']||null,
   retries: parseInt(E['TTS_RETRIES']||'8', 10),
   acodec: E['TTS_ACODEC']||'copy',
-  service: {
-    region: E['TTS_SERVICE_REGION']||null,
-    endpoint: E['TTS_SERVICE_ENDPOINT']||null
-  },
-  credentials: {
-    id: E['TTS_CREDENTIALS_ID']||null,
-    key: E['TTS_CREDENTIALS_KEY']||null,
-    path: E['TTS_CREDENTIALS_PATH']||null
-  },
   audio: {
     encoding: E['TTS_AUDIO_ENCODING']||null,
     frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0')
@@ -63,9 +52,10 @@ const OPTIONS = {
     break: parseFloat(E['TTS_NEWLINE_BREAK']||'1000')
   },
   block: {
-    length: parseFloat(E['TTS_BLOCK_LENGTH']||'2000'),
-    separator: E['TTS_BLOCK_SEPARATOR']||'.'
+    separator: E['TTS_BLOCK_SEPARATOR']||'.',
+    length: parseFloat(E['TTS_BLOCK_LENGTH']||'2000')
   },
+  config: null
 };
 const VOICE = new Map([
   ['cmn-CN', {f: 'Zhiyu', m: null}],
@@ -315,34 +305,34 @@ async function amazontts(out, txt, o) {
 
 // Get options from arguments.
 function options(o, k, a, i) {
-  if(k==='--help') o.help = true;
-  else if(k==='-l' || k==='--log') o.log = true;
-  else if(k==='-o' || k==='--output') o.output= a[++i];
-  else if(k==='-t' || k==='--text') o.text = a[++i];
-  else if(k==='-r' || k==='--retries') o.retries = parseInt(a[++i], 10);
-  else if(k==='-a' || k==='--acodec') _.set(o, 'acodec', a[++i]);
-  else if(k==='-sr' || k==='--service_region') _.set(o, 'service.region', a[++i]);
-  else if(k==='-se' || k==='--service_endpoint') _.set(o, 'service.endpoint', a[++i]);
-  else if(k==='-ci' || k==='--credentials_id') _.set(o, 'credentials.id', a[++i]);
-  else if(k==='-ck' || k==='--credentials_key') _.set(o, 'credentials.key', a[++i]);
-  else if(k==='-cp' || k==='--credentials_path') _.set(o, 'credentials.path', a[++i]);
-  else if(k==='-ae' || k==='--audio_encoding') _.set(o, 'audio.encoding', a[++i]);
-  else if(k==='-af' || k==='--audio_frequency') _.set(o, 'audio.frequency', parseInt(a[++i], 10));
-  else if(k==='-lc' || k==='--language_code') _.set(o, 'language.code', a[++i]);
-  else if(k==='-ll' || k==='--language_lexicons') _.set(o, 'language.lexicons', a[++i]);
-  else if(k==='-vn' || k==='--voice_name') _.set(o, 'voice.name', a[++i]);
-  else if(k==='-vg' || k==='--voice_gender') _.set(o, 'voice.gender', a[++i]);
-  else if(k==='-qb' || k==='--quote_break') _.set(o, 'quote.break', parseFloat(a[++i]));
-  else if(k==='-qe' || k==='--quote_emphasis') _.set(o, 'quote.emphasis', a[++i]);
-  else if(k==='-hb' || k==='--heading_break') _.set(o, 'heading.break', parseFloat(a[++i]));
-  else if(k==='-hd' || k==='--heading_difference') _.set(o, 'heading.difference', parseFloat(a[++i]));
-  else if(k==='-he' || k==='--heading_emphasis') _.set(o, 'heading.emphasis', a[++i]);
-  else if(k==='-eb' || k==='--ellipsis_break') _.set(o, 'ellipsis.break', parseFloat(a[++i]));
-  else if(k==='-db' || k==='--dash_break') _.set(o, 'dash.break', parseFloat(a[++i]));
-  else if(k==='-nb' || k==='--newline_break') _.set(o, 'newline.break', parseFloat(a[++i]));
-  else if(k==='-bl' || k==='--block_length') _.set(o, 'block.length', parseInt(a[++i], 10));
-  else if(k==='-bs' || k==='--block_separator') _.set(o, 'block.separator', a[++i]);
-  else o.input = a[i];
+  var e = k.indexOf('='), v = null, bool = () => true, str = () => a[++i];
+  if(e>=0) { v = k.substring(e+1); bool = () => boolean(v); str = () => v; k = k.substring(o, e); }
+  o.config = o.config||{};
+  if(k==='--help') o.help = bool();
+  else if(k==='-l' || k==='--log') o.log = bool();
+  else if(k==='-o' || k==='--output') o.output= str();
+  else if(k==='-t' || k==='--text') o.text = str();
+  else if(k==='-r' || k==='--retries') o.retries = parseInt(str(), 10);
+  else if(k==='-a' || k==='--acodec') _.set(o, 'acodec', str());
+  else if(k==='-ae' || k==='--audio_encoding') _.set(o, 'audio.encoding', str());
+  else if(k==='-af' || k==='--audio_frequency') _.set(o, 'audio.frequency', parseInt(str(), 10));
+  else if(k==='-lc' || k==='--language_code') _.set(o, 'language.code', str());
+  else if(k==='-ll' || k==='--language_lexicons') _.set(o, 'language.lexicons', str());
+  else if(k==='-vn' || k==='--voice_name') _.set(o, 'voice.name', str());
+  else if(k==='-vg' || k==='--voice_gender') _.set(o, 'voice.gender', str());
+  else if(k==='-qb' || k==='--quote_break') _.set(o, 'quote.break', parseFloat(str()));
+  else if(k==='-qe' || k==='--quote_emphasis') _.set(o, 'quote.emphasis', str());
+  else if(k==='-hb' || k==='--heading_break') _.set(o, 'heading.break', parseFloat(str()));
+  else if(k==='-hd' || k==='--heading_difference') _.set(o, 'heading.difference', parseFloat(str()));
+  else if(k==='-he' || k==='--heading_emphasis') _.set(o, 'heading.emphasis', str());
+  else if(k==='-eb' || k==='--ellipsis_break') _.set(o, 'ellipsis.break', parseFloat(str()));
+  else if(k==='-db' || k==='--dash_break') _.set(o, 'dash.break', parseFloat(str()));
+  else if(k==='-nb' || k==='--newline_break') _.set(o, 'newline.break', parseFloat(str()));
+  else if(k==='-bl' || k==='--block_length') _.set(o, 'block.length', parseInt(str(), 10));
+  else if(k==='-bs' || k==='--block_separator') _.set(o, 'block.separator', str());
+  else if(k.startsWith('-c')) awsconfig.options(o.config, '-'+k.substring(2), a, i);
+  else if(k.startsWith('--config_')) awsconfig.options(o.config, '--'+k.substring(9), a, i);
+  else o.argv = a[i];
   return i+1;
 };
 amazontts.options = options;

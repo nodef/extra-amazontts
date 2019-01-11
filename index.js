@@ -340,13 +340,18 @@ module.exports = amazontts;
 
 // Run on shell.
 async function shell(a) {
-  var o = {input: await getStdin()};
+  var o = {argv: await getStdin()};
   for(var i=2, I=a.length; i<I;)
     i = options(o, a[i], a, i);
   if(o.help) return cp.execSync('less README.md', {cwd: __dirname, stdio: STDIO});
-  var toc = await amazontts(null, null, o);
-  if(o.log || OPTIONS.log) return;
-  for(var c of toc)
-    if(c.title) console.log(c.time+' '+c.title);
+  try {
+    var txt = o.text? fs.readFileSync(o.text, 'utf8'):o.argv||'';
+    var out = o.output||'out.mp3';
+    var toc = await amazontts(out, txt, o);
+    if(o.log || OPTIONS.log) return;
+    for(var c of toc)
+      if(c.title) console.log(c.time+' '+c.title);
+  }
+  catch(err) { console.error(err.message); }
 };
 if(require.main===module) shell(process.argv);

@@ -121,7 +121,7 @@ function cpExec(cmd, o) {
 };
 
 // Get Polly synthesize speech params.
-function pollySynthesizeSpeechParams(out, txt, o) {
+function pollyParams(out, txt, o) {
   var ae = (o.audio.encoding||path.extname(out).substring(1)).toLowerCase().replace('ogg', 'ogg_vorbis');
   var af = o.audio.frequency? o.audio.frequency.toString():null;
   var vg = /^f/i.test(o.voice.gender)? 'f':(/^m/i.test(o.voice.gender)? 'm':null);
@@ -249,7 +249,7 @@ async function outputAudio(out, auds, o) {
 async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
   if(o.log) console.log('@amazontts:', out, txt);
-  o.params = o.params||pollySynthesizeSpeechParams(out, null, o);
+  o.params = o.params||pollyParams(out, null, o);
   var tts = new Polly(awsconfig(o.config));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});

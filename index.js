@@ -103,13 +103,6 @@ function pathFilename(pth) {
   return pth.substring(0, pth.length-path.extname(pth).length);
 };
 
-// Read file, return promise.
-function fsReadFile(pth, o) {
-  return new Promise((fres, frej) => fs.readFile(pth, o, (err, data) => {
-    return err? frej(err):fres(data);
-  }));
-};
-
 // Write file, return promise.
 function fsWriteFile(pth, dat, o) {
   return new Promise((fres, frej) => fs.writeFile(pth, dat, o, (err) => {
@@ -125,28 +118,6 @@ function cpExec(cmd, o) {
   return new Promise((fres, frej) => cp.exec(cmd, {stdio}, (err, stdout, stderr) => {
     return err? frej(err):fres({stdout, stderr});
   }));
-};
-
-// Load Polly config from path.
-function pollyConfigLoad(pth) {
-  var dat = fs.readFileSync(pth, 'utf8');
-  if(pth.endsWith('.json')) return JSON.parse(dat);
-  var cfg = ini.parse(dat), z = {};
-  cfg = cfg.default||cfg;
-  for(var k in cfg)
-    z[_.camelCase(k.replace(/^aws_/, ''))] = cfg[k];
-  return z;
-};
-
-// Get Polly config.
-function pollyConfig(o) {
-  var s = o.service, c = o.credentials;
-  var z = c.path? pollyConfigLoad(randomItem(c.path.split(';'))):{};
-  z.endpoint = s.endpoint||z.endpoint;
-  z.accessKeyId = c.id||z.accessKeyId;
-  z.secretAccessKey = c.key||z.secretAccessKey;
-  z.region = s.region||z.region||'us-east-1';
-  return z;
 };
 
 // Get Polly synthesize speech params.
@@ -222,7 +193,7 @@ function audiosWrite(out, ssml, tts, o) {
 // Write TTS audio to file, with retries.
 async function audiosRetryWrite(out, ssml, tts, o) {
   var err = null;
-  for(var i=0; i<o.retries; i++) {
+  for(var i=0, I=o.retries||8; i<I; i++) {
     try { return await audiosWrite(out, ssml, tts, o); }
     catch(e) { err = e; }
   }
@@ -277,11 +248,9 @@ async function outputAudio(out, auds, o) {
  */
 async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
-  var out = out||o.output, c = o.credentials;
-  var txt = txt||o.input||(o.text? await fsReadFile(o.text, 'utf8'):null);
   if(o.log) console.log('@amazontts:', out, txt);
   o.params = o.params||pollySynthesizeSpeechParams(out, null, o);
-  var tts = new Polly(o.config||pollyConfig(o));
+  var tts = new Polly(awsconfig(o.config));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});
   var secs = textSections('\n'+txt), prts = [], ssmls = [];

@@ -133,6 +133,7 @@ function pollyParams(out, txt, o) {
 // Get SSML from text.
 function textSsml(txt, o) {
   var q = o.quote, h = o.heading, e = o.ellipsis, d = o.dash, n = o.newline;
+  txt = txt.replace(/\s*&\s*/g, ' and ');
   txt = txt.replace(/\"(.*?)\"/gm, (m, p1) => {
     var brk = `<break time="${q.break}ms"/>`;
     var emp = `<emphasis level="${q.emphasis}">"${p1}"</emphasis>`;

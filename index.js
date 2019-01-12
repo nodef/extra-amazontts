@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-const Polly = require('aws-sdk/clients/polly');
 const musicMetadata = require('music-metadata');
 const awsconfig = require('extra-awsconfig');
+const AWS = require('aws-sdk');
 const getStdin = require('get-stdin');
 const boolean = require('boolean');
 const tempy = require('tempy');
-const ini = require('ini');
 const _ = require('lodash');
 const cp = require('child_process');
 const path = require('path');
@@ -251,7 +250,7 @@ async function amazontts(out, txt, o) {
   var o = _.merge({}, OPTIONS, o);
   if(o.log) console.log('@amazontts:', out, txt);
   o.params = o.params||pollyParams(out, null, o);
-  var tts = new Polly(awsconfig(o.config));
+  var tts = new AWS.Polly(awsconfig(o.config));
   var ext = path.extname(out);
   var aud = tempy.file({extension: ext.substring(1)});
   var secs = textSections('\n'+txt), prts = [], ssmls = [];

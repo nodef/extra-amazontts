@@ -137,7 +137,7 @@ amazontts(output, text, options={})
 // Default options:
 options = {
   stdio: [0, 1, 2], // set child process stdio
-  quiet: false,     // enable quiet mode
+  log: false,       // enable log
   retries: 8,       // set speech synthesis retries
   acodec: 'copy',   // set audio acodec
   audio: {

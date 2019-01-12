@@ -22,7 +22,7 @@ const OPTIONS = {
   acodec: E['TTS_ACODEC']||'copy',
   audio: {
     encoding: E['TTS_AUDIO_ENCODING']||null,
-    frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0')
+    frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0', 10)
   },
   language: {
     code: E['TTS_LANGUAGE_CODE']||null,

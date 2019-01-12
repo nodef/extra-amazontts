@@ -15,9 +15,8 @@ Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/zyuywxcb).
 
 ### install
 
-1. Install [Node.js], if not installed.
-2. Run `npm install -g extra-amazontts` in [console].
-3. To install this as a package use `npm install extra-amazontts`.
+1. Run `npm install -g extra-amazontts` in **console**.
+2. To install this as a package use `npm install extra-amazontts`.
 <br>
 
 
@@ -52,11 +51,6 @@ amazontts [options] <text>
 # -t, --text:    set input text file
 # -r, --retries: set speech synthesis retries (8)
 # -a, --acodec:      set acodec (copy)
-# -sr, --service_region:    set region to send service requests to (us-east-1)
-# -se, --service_endpoint:  set endpoint to send requests to
-# -ci, --credentials_id:    set AWS access key id
-# -ck, --credentials_key:   set AWS secret access key
-# -cp, --credentials_path:  set AWS config path (~/.aws/config)
 # -ae, --audio_encoding:    set audio encoding
 # -as, --audio_frequency:   set audio frequency/sample rate in Hz
 # -tt, --text_type:         set text type (text)
@@ -74,6 +68,7 @@ amazontts [options] <text>
 # -nb, --newline_break:      set newline break time (1000)
 # -bl, --block_length:       set SSML block length (3000)
 # -bs, --block_separator:    set SSML block separator (.)
+# -c*, --config_*:           set amazon config options (see Extra AWS Config options below)
 ## (all times are in milliseconds)
 
 # Environment variables:
@@ -82,12 +77,6 @@ $TTS_OUTPUT  # set output audio file (out.mp3)
 $TTS_TEXT    # set input text file
 $TTS_RETRIES # set speech synthesis retries (8)
 $TTS_ACODEC            # set audio acodec (copy)
-$TTS_SERVICE_REGION    # set region to send service requests to (us-east-1)
-$TTS_SERVICE_ENDPOINT  # set endpoint to send requests to
-$TTS_CREDENTIALS_ID    # set AWS access key id
-$TTS_CREDENTIALS_KEY   # set AWS secret access key
-$AWS_CONFIG_FILE       # set AWS config path (~/.aws/config)
-$TTS_CREDENTIALS_PATH  # set AWS config (json/ini) path
 $TTS_AUDIO_ENCODING    # set audio encoding format
 $TTS_AUDIO_FREQUENCY   # set audio frequency/sample rate in Hz
 $TTS_LANGUAGE_CODE     # set language code
@@ -104,7 +93,9 @@ $TTS_DASH_BREAK         # set dash break time (500)
 $TTS_NEWLINE_BREAK      # set newline break time (1000)
 $TTS_BLOCK_LENGTH       # set SSML block length (5000)
 $TTS_BLOCK_SEPARATOR    # set SSML block separator (.)
+...                     # see Extra AWS Config options below
 ```
+> See [Extra AWS Config] options.
 <br>
 
 
@@ -127,9 +118,9 @@ await amazontts('out.mp3', 'Hello 911, my husband is in danger!', {
 // out.mp3 created with female voice
 
 await amazontts('out.mp3', 'Dead man walking.', {
-  voice: {name: 'Matthew'}, quiet: true
+  voice: {name: 'Matthew'}, log: true
 });
-// out.mp3 created with different male voice (quiet mode)
+// out.mp3 created with different male voice (log enabled)
 ```
 
 ### reference
@@ -149,15 +140,6 @@ options = {
   quiet: false,     // enable quiet mode
   retries: 8,       // set speech synthesis retries
   acodec: 'copy',   // set audio acodec
-  service: {
-    region: 'us-east-1', // set region to send service requests to
-    endpoint: ''         // set endpoint to send requests to
-  },
-  credentials: {
-    id: '',   // set AWS access key id
-    key: '',  // set AWS secret access key
-    path: ''  // set AWS config (json/ini) path
-  }, 
   audio: {
     encoding: '',  // set audio encoding format
     frequency: 0,  // set audio frequency/sample rate in Hz
@@ -192,14 +174,11 @@ options = {
     length: 5000,       // set SSML block length
     separator: '.'      // set SSML block separator
   }
-  config: {         // set AWS config options "directly"
-    /* AWS config options */
-  },
-  params: {         // set Polly synthesizeSpeech params "directly"
-    /* Polly synthesizeSpeech params */
-  }
+  config: null,     // set amazon config options (see Extra AWS Config options below)
+  params: null      // set Polly synthesizeSpeech params "directly"
 }
 ```
+> See [Extra AWS Config] options.
 <br>
 
 
@@ -220,9 +199,7 @@ Suggestions are welcome. Please [create an issue].
 ["ffmpeg"]: https://ffmpeg.org
 [Upload Wikipedia TTS videos on YouTube]: https://www.youtube.com/results?search_query=wikipedia+audio+article
 
-[Node.js]: https://nodejs.org/en/download/
-[console]: https://en.wikipedia.org/wiki/Shell_(computing)#Text_(CLI)_shells
-
+[Extra AWS Config]: https://www.npmjs.com/package/extra-awsconfig
 [extra-stillvideo]: https://www.npmjs.com/package/extra-stillvideo
 [extra-youtubeuploader]: https://www.npmjs.com/package/extra-youtubeuploader
 [create an issue]: https://github.com/nodef/extra-amazontts/issues

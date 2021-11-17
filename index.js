@@ -1,113 +1,131 @@
 #!/usr/bin/env node
-const getStdin = require('get-stdin');
-const tempy = require('tempy');
-const boolean = require('boolean').boolean;
-const musicMetadata = require('music-metadata');
-const awsconfig = require('extra-awsconfig');
-const AWS = require('aws-sdk');
-const _ = require('lodash');
-const cp = require('child_process');
+const cp   = require('child_process');
+const fs   = require('fs');
 const path = require('path');
-const fs = require('fs');
+const _       = require('lodash');
+const boolean = require('boolean').boolean;
+const AWS     = require('aws-sdk');
+const musicMetadata = require('music-metadata');
+const awsconfig     = require('extra-awsconfig');
+var getStdin = null;
+var tempy    = null;
+
+
 
 
 // Global variables
-const E = process.env;
-const STDIO = [0, 1, 2];
+const E       = process.env;
+const STDIO   = [0, 1, 2];
 const OPTIONS = {
-  log: boolean(E['TTS_LOG']||'0'),
-  output: E['TTS_OUTPUT']||'out.mp3',
-  text: E['TTS_TEXT']||null,
-  retries: parseInt(E['TTS_RETRIES']||'8', 10),
-  acodec: E['TTS_ACODEC']||'copy',
+  log:      boolean(E['TTS_LOG']     || '0'),
+  output:           E['TTS_OUTPUT']  || 'out.mp3',
+  text:             E['TTS_TEXT']    || null,
+  retries: parseInt(E['TTS_RETRIES'] || '8', 10),
+  acodec:           E['TTS_ACODEC']  || 'copy',
   audio: {
-    encoding: E['TTS_AUDIO_ENCODING']||null,
-    frequency: parseInt(E['TTS_AUDIO_FREQUENCY']||'0', 10)
+    encoding:           E['TTS_AUDIO_ENCODING']  || null,
+    frequency: parseInt(E['TTS_AUDIO_FREQUENCY'] || '0', 10)
   },
   language: {
-    code: E['TTS_LANGUAGE_CODE']||null,
-    lexicons: (E['TTS_LANGUAGE_LEXICONS']||'').split(',').filter(v => !!v),
+    code:      E['TTS_LANGUAGE_CODE']     || null,
+    lexicons: (E['TTS_LANGUAGE_LEXICONS'] || '').split(',').filter(v => !!v),
   },
   voice: {
-    name:  E['TTS_VOICE_NAME']||null,
-    gender: E['TTS_VOICE_GENDER']||'neutral'
+    name:   E['TTS_VOICE_NAME']   || null,
+    gender: E['TTS_VOICE_GENDER'] || 'neutral'
   },
   quote: {
-    break: parseFloat(E['TTS_QUOTE_BREAK']||'250'),
-    emphasis: E['TTS_QUOTE_EMPHASIS']||'moderate'
+    break: parseFloat(E['TTS_QUOTE_BREAK']    || '250'),
+    emphasis:         E['TTS_QUOTE_EMPHASIS'] || 'moderate'
   },
   heading: {
-    break: parseFloat(E['TTS_HEADING_BREAK']||'4000'),
-    difference: parseFloat(E['TTS_HEADING_DIFFERENCE']||'250'),
-    emphasis: E['TTS_HEADING_EMPHASIS']||'strong',
+    break: parseFloat(     E['TTS_HEADING_BREAK']      || '4000'),
+    difference: parseFloat(E['TTS_HEADING_DIFFERENCE'] || '250'),
+    emphasis:              E['TTS_HEADING_EMPHASIS']   || 'strong',
   },
   ellipsis: {
-    break: parseFloat(E['TTS_ELLIPSIS_BREAK']||'1500')
+    break: parseFloat(E['TTS_ELLIPSIS_BREAK'] || '1500')
   },
   dash: {
-    break: parseFloat(E['TTS_DASH_BREAK']||'500')
+    break: parseFloat(E['TTS_DASH_BREAK']     || '500')
   },
   newline: {
-    break: parseFloat(E['TTS_NEWLINE_BREAK']||'1000')
+    break: parseFloat(E['TTS_NEWLINE_BREAK']  || '1000')
   },
   block: {
-    separator: E['TTS_BLOCK_SEPARATOR']||'.',
-    length: parseFloat(E['TTS_BLOCK_LENGTH']||'2000')
+    separator:         E['TTS_BLOCK_SEPARATOR'] || '.',
+    length: parseFloat(E['TTS_BLOCK_LENGTH']    || '2000')
   },
   config: null
 };
 const VOICE = new Map([
-  ['cmn-CN', {f: 'Zhiyu', m: null}],
-  ['da-DK', {f: 'Naja', m: 'Mads'}],
-  ['nl-NL', {f: 'Lotte', m: 'Ruben'}],
-  ['en-AU', {f: 'Nicole', m: 'Russell'}],
-  ['en-GB', {f: 'Amy', m: 'Brian'}],
-  ['en-IN', {f: 'Aditi', m: null}],
-  ['en-US', {f: 'Ivy', m: 'Joey'}],
-  ['en-GB-WLS', {f: null, m: 'Geraint'}],
-  ['fr-FR', {f: 'Celine', m: 'Mathieu'}],
-  ['fr-CA', {f: 'Chantal', m: null}],
-  ['de-DE', {f: 'Marlene', m: 'Hans'}],
-  ['hi-IN', {f: 'Aditi', m: null}],
-  ['is-IS', {f: 'Dora', m: 'Karl'}],
-  ['it-IT', {f: 'Carla', m: 'Giorgio'}],
-  ['ja-JP', {f: 'Mizuki', m: 'Takumi'}],
-  ['ko-KR', {f: 'Seoyeon', m: null}],
-  ['nb-NO', {f: 'Liv', m: null}],
-  ['pl-PL', {f: 'Ewa', m: 'Jacek'}],
-  ['pt-BR', {f: 'Vitoria', m: 'Ricardo'}],
-  ['pt-PT', {f: 'Ines', m: 'Cristiano'}],
-  ['ro-RO', {f: 'Carmen', m: null}],
-  ['ru-RU', {f: 'Tatyana', m: 'Tatyana'}],
-  ['es-ES', {f: 'Conchita', m: 'Enrique'}],
-  ['es-MX', {f: 'Mia', m: null}],
-  ['es-US', {f: 'Penelope', m: 'Miguel'}],
-  ['sv-SE', {f: 'Astrid', m: null}],
-  ['tr-TR', {f: 'Filiz', m: null}],
-  ['cy-GB', {f: 'Gwyneth', m: null}]
+  ['cmn-CN', {f: 'Zhiyu',    m: null}],
+  ['da-DK',  {f: 'Naja',     m: 'Mads'}],
+  ['nl-NL',  {f: 'Lotte',    m: 'Ruben'}],
+  ['en-AU',  {f: 'Nicole',   m: 'Russell'}],
+  ['en-GB',  {f: 'Amy',      m: 'Brian'}],
+  ['en-IN',  {f: 'Aditi',    m: null}],
+  ['en-US',  {f: 'Ivy',      m: 'Joey'}],
+  ['en-GB-WLS', {f: null,    m: 'Geraint'}],
+  ['fr-FR',  {f: 'Celine',   m: 'Mathieu'}],
+  ['fr-CA',  {f: 'Chantal',  m: null}],
+  ['de-DE',  {f: 'Marlene',  m: 'Hans'}],
+  ['hi-IN',  {f: 'Aditi',    m: null}],
+  ['is-IS',  {f: 'Dora',     m: 'Karl'}],
+  ['it-IT',  {f: 'Carla',    m: 'Giorgio'}],
+  ['ja-JP',  {f: 'Mizuki',   m: 'Takumi'}],
+  ['ko-KR',  {f: 'Seoyeon',  m: null}],
+  ['nb-NO',  {f: 'Liv',      m: null}],
+  ['pl-PL',  {f: 'Ewa',      m: 'Jacek'}],
+  ['pt-BR',  {f: 'Vitoria',  m: 'Ricardo'}],
+  ['pt-PT',  {f: 'Ines',     m: 'Cristiano'}],
+  ['ro-RO',  {f: 'Carmen',   m: null}],
+  ['ru-RU',  {f: 'Tatyana',  m: 'Tatyana'}],
+  ['es-ES',  {f: 'Conchita', m: 'Enrique'}],
+  ['es-MX',  {f: 'Mia',      m: null}],
+  ['es-US',  {f: 'Penelope', m: 'Miguel'}],
+  ['sv-SE',  {f: 'Astrid',   m: null}],
+  ['tr-TR',  {f: 'Filiz',    m: null}],
+  ['cy-GB',  {f: 'Gwyneth',  m: null}]
 ]);
 const FN_NOP = () => 0;
 
 
+
+
+// ES modules dependency loader :).
+async function importDependencies() {
+  if (getStdin!=null) return;
+  var $ = await Promise.all([
+    import('get-stdin'),
+    import('tempy')
+  ]);
+  getStdin = $[0].default;
+  tempy    = $[1].default;
+}
+
+
+
+
 // Format time in HH:MM:SS format.
 function timeFormat(t) {
-  var hh = Math.floor(t/3600).toString().padStart(2, '0');
+  var hh = Math.floor(t/3600)     .toString().padStart(2, '0');
   var mm = Math.floor((t%3600)/60).toString().padStart(2, '0');
-  var ss = Math.floor(t%60).toString().padStart(2, '0');
+  var ss = Math.floor(t%60)       .toString().padStart(2, '0');
   return `${hh}:${mm}:${ss}`;
 };
 
 // Get filename, without extension.
 function pathFilename(pth) {
   return pth.substring(0, pth.length-path.extname(pth).length);
-};
+}
 
 // Write file, return promise.
 function fsWriteFile(pth, dat, o) {
   return new Promise((fres, frej) => fs.writeFile(pth, dat, o, (err) => {
     return err? frej(err):fres();
   }));
-};
+}
 
 // Execute child process, return promise.
 function cpExec(cmd, o) {
@@ -117,7 +135,10 @@ function cpExec(cmd, o) {
   return new Promise((fres, frej) => cp.exec(cmd, {stdio}, (err, stdout, stderr) => {
     return err? frej(err):fres({stdout, stderr});
   }));
-};
+}
+
+
+
 
 // Get Polly synthesize speech params.
 function pollyParams(out, txt, o) {
@@ -127,7 +148,10 @@ function pollyParams(out, txt, o) {
   var v = VOICE.get(o.language.code)||{}, vn = o.voice.name||(vg==='m'? v.m||v.f||'Joey':v.f||v.m||'Joanna');
   return {LexiconNames: o.language.lexicons, OutputFormat: ae, SampleRate: af, Text: txt,
     TextType: 'ssml', VoiceId: vn, LanguageCode: o.language.code};
-};
+}
+
+
+
 
 // Get SSML from text.
 function textSsml(txt, o) {
@@ -149,7 +173,7 @@ function textSsml(txt, o) {
   txt = txt.replace(/\—/g, `<break time="${d.break}ms"/>—`);
   txt = txt.replace(/(\r?\n)+/gm, `<break time="${n.break}ms"/>\n`);
   return `<speak>${txt}</speak>`;
-};
+}
 
 // Get SSML block from long text.
 function textSsmlBlock(txt, o) {
@@ -162,7 +186,7 @@ function textSsmlBlock(txt, o) {
     if(ssml.length<b.length) break;
   }
   return [ssml, txt.substring(i)];
-};
+}
 
 // Get sections for text.
 function textSections(txt) {
@@ -173,7 +197,10 @@ function textSections(txt) {
   }
   secs.push({title, content: txt.substring(i)});
   return secs;
-};
+}
+
+
+
 
 // Write TTS audio to file.
 function audiosWrite(out, ssml, tts, o) {
@@ -188,7 +215,7 @@ function audiosWrite(out, ssml, tts, o) {
       });
     });
   });
-};
+}
 
 // Write TTS audio to file, with retries.
 async function audiosRetryWrite(out, ssml, tts, o) {
@@ -199,7 +226,10 @@ async function audiosRetryWrite(out, ssml, tts, o) {
   }
   console.log(ssml);
   throw err;
-};
+}
+
+
+
 
 // Generate output SSML parts.
 function outputSsmls(txt, o) {
@@ -208,7 +238,7 @@ function outputSsmls(txt, o) {
     z[i] = ssml;
   }
   return z;
-};
+}
 
 // Generate output audio part files.
 function outputAudios(out, ssmls, tts, o) {
@@ -217,7 +247,7 @@ function outputAudios(out, ssmls, tts, o) {
   for(var i=0, I=ssmls.length, z=[]; i<I; i++)
     z[i] = audiosRetryWrite(`${pth}.${i}${ext}`, ssmls[i], tts, o);
   return Promise.all(z);
-};
+}
 
 // Get durations of audio part files.
 function outputDurations(auds) {
@@ -225,7 +255,7 @@ function outputDurations(auds) {
   for(var aud of auds)
     durs.push(musicMetadata.parseFile(aud).then(m => m.format.duration));
   return Promise.all(durs);
-};
+}
 
 // Generate output audio file.
 async function outputAudio(out, auds, o) {
@@ -237,7 +267,10 @@ async function outputAudio(out, auds, o) {
   var z = await cpExec(`ffmpeg -y -safe 0 -f concat -i "${lst}" -acodec ${o.acodec} "${out}"`, o);
   fs.unlink(lst, FN_NOP);
   return z;
-};
+}
+
+
+
 
 /**
  * Generate speech audio from super long text through machine (via "Amazon Polly", "ffmpeg").
@@ -247,6 +280,7 @@ async function outputAudio(out, auds, o) {
  * @returns promise <out>.
  */
 async function amazontts(out, txt, o) {
+  await importDependencies();
   var o = _.merge({}, OPTIONS, o);
   if(o.log) console.log('@amazontts:', out, txt);
   o.params = o.params||pollyParams(out, null, o);
@@ -270,45 +304,49 @@ async function amazontts(out, txt, o) {
   for(var f of auds) fs.unlink(f, FN_NOP);
   if(o.log) console.log(' .toc:', toc);
   return toc;
-};
+}
 
 // Get options from arguments.
 function options(o, k, a, i) {
-  var e = k.indexOf('='), v = null, bool = () => true, str = () => a[++i];
-  if(e>=0) { v = k.substring(e+1); bool = () => boolean(v); str = () => v; k = k.substring(o, e); }
+  var e = k.indexOf('='), v = null, bool = () => true,       str = () => a[++i];
+  if(e>=0) { v = k.substring(e+1);  bool = () => boolean(v); str = () => v; k = k.substring(o, e); }
   o.config = o.config||{};
   if(k==='--help') o.help = bool();
-  else if(k==='-l' || k==='--log') o.log = bool();
-  else if(k==='-o' || k==='--output') o.output= str();
-  else if(k==='-t' || k==='--text') o.text = str();
-  else if(k==='-r' || k==='--retries') o.retries = parseInt(str(), 10);
-  else if(k==='-a' || k==='--acodec') _.set(o, 'acodec', str());
-  else if(k==='-ae' || k==='--audio_encoding') _.set(o, 'audio.encoding', str());
-  else if(k==='-af' || k==='--audio_frequency') _.set(o, 'audio.frequency', parseInt(str(), 10));
-  else if(k==='-lc' || k==='--language_code') _.set(o, 'language.code', str());
-  else if(k==='-ll' || k==='--language_lexicons') _.set(o, 'language.lexicons', str());
-  else if(k==='-vn' || k==='--voice_name') _.set(o, 'voice.name', str());
-  else if(k==='-vg' || k==='--voice_gender') _.set(o, 'voice.gender', str());
-  else if(k==='-qb' || k==='--quote_break') _.set(o, 'quote.break', parseFloat(str()));
-  else if(k==='-qe' || k==='--quote_emphasis') _.set(o, 'quote.emphasis', str());
-  else if(k==='-hb' || k==='--heading_break') _.set(o, 'heading.break', parseFloat(str()));
+  else if(k==='-l'  || k==='--log')     o.log     = bool();
+  else if(k==='-o'  || k==='--output')  o.output  = str();
+  else if(k==='-t'  || k==='--text')    o.text    = str();
+  else if(k==='-r'  || k==='--retries') o.retries = parseInt(str(), 10);
+  else if(k==='-a'  || k==='--acodec')             _.set(o, 'acodec',             str());
+  else if(k==='-ae' || k==='--audio_encoding')     _.set(o, 'audio.encoding',     str());
+  else if(k==='-af' || k==='--audio_frequency')    _.set(o, 'audio.frequency',    parseInt(str(), 10));
+  else if(k==='-lc' || k==='--language_code')      _.set(o, 'language.code',      str());
+  else if(k==='-ll' || k==='--language_lexicons')  _.set(o, 'language.lexicons',  str());
+  else if(k==='-vn' || k==='--voice_name')         _.set(o, 'voice.name',         str());
+  else if(k==='-vg' || k==='--voice_gender')       _.set(o, 'voice.gender',       str());
+  else if(k==='-qb' || k==='--quote_break')        _.set(o, 'quote.break',        parseFloat(str()));
+  else if(k==='-qe' || k==='--quote_emphasis')     _.set(o, 'quote.emphasis',     str());
+  else if(k==='-hb' || k==='--heading_break')      _.set(o, 'heading.break',      parseFloat(str()));
   else if(k==='-hd' || k==='--heading_difference') _.set(o, 'heading.difference', parseFloat(str()));
-  else if(k==='-he' || k==='--heading_emphasis') _.set(o, 'heading.emphasis', str());
-  else if(k==='-eb' || k==='--ellipsis_break') _.set(o, 'ellipsis.break', parseFloat(str()));
-  else if(k==='-db' || k==='--dash_break') _.set(o, 'dash.break', parseFloat(str()));
-  else if(k==='-nb' || k==='--newline_break') _.set(o, 'newline.break', parseFloat(str()));
-  else if(k==='-bl' || k==='--block_length') _.set(o, 'block.length', parseInt(str(), 10));
-  else if(k==='-bs' || k==='--block_separator') _.set(o, 'block.separator', str());
-  else if(k.startsWith('-c')) awsconfig.options(o.config, '-'+k.substring(2), a, i);
+  else if(k==='-he' || k==='--heading_emphasis')   _.set(o, 'heading.emphasis',   str());
+  else if(k==='-eb' || k==='--ellipsis_break')     _.set(o, 'ellipsis.break',     parseFloat(str()));
+  else if(k==='-db' || k==='--dash_break')         _.set(o, 'dash.break',         parseFloat(str()));
+  else if(k==='-nb' || k==='--newline_break')      _.set(o, 'newline.break',      parseFloat(str()));
+  else if(k==='-bl' || k==='--block_length')       _.set(o, 'block.length',       parseInt(str(), 10));
+  else if(k==='-bs' || k==='--block_separator')    _.set(o, 'block.separator',    str());
+  else if(k.startsWith('-c'))        awsconfig.options(o.config,  '-'+k.substring(2), a, i);
   else if(k.startsWith('--config_')) awsconfig.options(o.config, '--'+k.substring(9), a, i);
   else o.argv = a[i];
   return i+1;
-};
+}
 amazontts.options = options;
 module.exports = amazontts;
 
+
+
+
 // Run on shell.
 async function shell(a) {
+  await importDependencies();
   var o = {argv: await getStdin()};
   for(var i=2, I=a.length; i<I;)
     i = options(o, a[i], a, i);
@@ -319,5 +357,5 @@ async function shell(a) {
   if(o.log || OPTIONS.log) return;
   for(var c of toc)
     if(c.title) console.log(c.time+' '+c.title);
-};
+}
 if(require.main===module) shell(process.argv);

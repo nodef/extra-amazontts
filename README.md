@@ -1,4 +1,4 @@
-Generate speech audio from super long text through machine (via ["Amazon Polly"], ["ffmpeg"]).
+Generate speech audio from super long text through machine, via [Amazon Polly], [ffmpeg]).
 > Do you want to:
 > - Share your ideas anonymously on YouTube?
 > - Pretend on phone that you are not a kid (Home Alone)?
@@ -8,19 +8,21 @@ Generate speech audio from super long text through machine (via ["Amazon Polly"]
 > - Or, [Upload Wikipedia TTS videos on YouTube]?
 
 Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/zyuywxcb).
+
+<br>
 <br>
 
 
-## setup
-
-### install
+## Setup
 
 1. Run `npm install -g extra-amazontts` in **console**.
 2. To install this as a package use `npm install extra-amazontts`.
+
+<br>
 <br>
 
 
-## console
+## Console
 
 ```bash
 amazontts "I want to order a stuffed crust pizza"
@@ -38,7 +40,7 @@ echo "Dead man walking." | amazontts --log -vn Matthew
 > Available [TTS voices]?
 
 
-### reference
+### Reference
 
 ```bash
 amazontts [options] <text>
@@ -96,10 +98,12 @@ $TTS_BLOCK_SEPARATOR    # set SSML block separator (.)
 ...                     # see Extra AWS Config options below
 ```
 > See [Extra AWS Config] options.
+
+<br>
 <br>
 
 
-## package
+## Package
 
 ```javascript
 const amazontts = require('extra-amazontts');
@@ -123,7 +127,8 @@ await amazontts('out.mp3', 'Dead man walking.', {
 // out.mp3 created with different male voice (log enabled)
 ```
 
-### reference
+
+### Reference
 
 ```javascript
 const amazontts = require('extra-amazontts');
@@ -179,24 +184,28 @@ options = {
 }
 ```
 > See [Extra AWS Config] options.
+
+<br>
 <br>
 
 
-## similar
+## Similar
 
 Do you need anything similar?
 - [extra-youtubeuploader] can upload videos with caption to YouTube.
 - [extra-stillvideo] can generate video from audio and image.
 
 Suggestions are welcome. Please [create an issue].
-<br><br>
+
+<br>
+<br>
 
 
 [![nodef](https://i.imgur.com/Ui0cS8T.jpg)](https://nodef.github.io)
 > References: [SSML], [TTS voices], [TTS client docs].
 
-["Amazon Polly"]: https://aws.amazon.com/polly/
-["ffmpeg"]: https://ffmpeg.org
+[Amazon Polly]: https://aws.amazon.com/polly/
+[ffmpeg]: https://ffmpeg.org
 [Upload Wikipedia TTS videos on YouTube]: https://www.youtube.com/results?search_query=wikipedia+audio+article
 
 [Extra AWS Config]: https://www.npmjs.com/package/extra-awsconfig

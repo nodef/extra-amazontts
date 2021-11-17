@@ -273,7 +273,7 @@ async function outputAudio(out, auds, o) {
 
 
 /**
- * Generate speech audio from super long text through machine (via "Amazon Polly", "ffmpeg").
+ * Generate speech audio from super long text through machine, via Amazon Polly, ffmpeg.
  * @param {string} out output audio file.
  * @param {string} txt input text.
  * @param {object} o options.

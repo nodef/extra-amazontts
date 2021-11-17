@@ -17,6 +17,7 @@ Sample: ["I want to order a stuffed crust pizza"](https://clyp.it/zyuywxcb).
 
 1. Run `npm install -g extra-amazontts` in **console**.
 2. To install this as a package use `npm install extra-amazontts`.
+3. Make sure [ffmpeg] is installed (present in PATH).
 
 <br>
 <br>

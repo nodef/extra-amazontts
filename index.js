@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+const getStdin = require('get-stdin');
+const tempy = require('tempy');
+const boolean = require('boolean').boolean;
 const musicMetadata = require('music-metadata');
 const awsconfig = require('extra-awsconfig');
 const AWS = require('aws-sdk');
-const getStdin = require('get-stdin');
-const {boolean} = require('boolean');
-const tempy = require('tempy');
 const _ = require('lodash');
 const cp = require('child_process');
 const path = require('path');
